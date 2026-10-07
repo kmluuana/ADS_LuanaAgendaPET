@@ -28,4 +28,22 @@ model Cliente {
   ativo     Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  pets Pet[]
+}
+
+model Pet {
+  id             Int       @id @default(autoincrement())
+  nome           String
+  especie        String
+  raca           String?
+  dataNascimento DateTime?
+  observacoes    String?
+  ativo          Boolean   @default(true)
+
+  clienteId Int
+  cliente   Cliente @relation(fields: [clienteId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

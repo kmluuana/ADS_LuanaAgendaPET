@@ -27,3 +27,8 @@ export type Servico = Prisma.ServicoModel
  * 
  */
 export type Cliente = Prisma.ClienteModel
+/**
+ * Model Pet
+ * 
+ */
+export type Pet = Prisma.PetModel

@@ -52,7 +52,8 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   Servico: 'Servico',
-  Cliente: 'Cliente'
+  Cliente: 'Cliente',
+  Pet: 'Pet'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -96,6 +97,22 @@ export const ClienteScalarFieldEnum = {
 } as const
 
 export type ClienteScalarFieldEnum = (typeof ClienteScalarFieldEnum)[keyof typeof ClienteScalarFieldEnum]
+
+
+export const PetScalarFieldEnum = {
+  id: 'id',
+  nome: 'nome',
+  especie: 'especie',
+  raca: 'raca',
+  dataNascimento: 'dataNascimento',
+  observacoes: 'observacoes',
+  ativo: 'ativo',
+  clienteId: 'clienteId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PetScalarFieldEnum = (typeof PetScalarFieldEnum)[keyof typeof PetScalarFieldEnum]
 
 
 export const SortOrder = {
