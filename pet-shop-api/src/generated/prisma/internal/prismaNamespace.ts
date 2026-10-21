@@ -399,7 +399,9 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 export const ModelName = {
   Servico: 'Servico',
   Cliente: 'Cliente',
-  Pet: 'Pet'
+  Pet: 'Pet',
+  Profissional: 'Profissional',
+  ProfissionalServico: 'ProfissionalServico'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -415,7 +417,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "servico" | "cliente" | "pet"
+    modelProps: "servico" | "cliente" | "pet" | "profissional" | "profissionalServico"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -641,6 +643,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    Profissional: {
+      payload: Prisma.$ProfissionalPayload<ExtArgs>
+      fields: Prisma.ProfissionalFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ProfissionalFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfissionalPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ProfissionalFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfissionalPayload>
+        }
+        findFirst: {
+          args: Prisma.ProfissionalFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfissionalPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ProfissionalFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfissionalPayload>
+        }
+        findMany: {
+          args: Prisma.ProfissionalFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfissionalPayload>[]
+        }
+        create: {
+          args: Prisma.ProfissionalCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfissionalPayload>
+        }
+        createMany: {
+          args: Prisma.ProfissionalCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ProfissionalCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfissionalPayload>[]
+        }
+        delete: {
+          args: Prisma.ProfissionalDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfissionalPayload>
+        }
+        update: {
+          args: Prisma.ProfissionalUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfissionalPayload>
+        }
+        deleteMany: {
+          args: Prisma.ProfissionalDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ProfissionalUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ProfissionalUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfissionalPayload>[]
+        }
+        upsert: {
+          args: Prisma.ProfissionalUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfissionalPayload>
+        }
+        aggregate: {
+          args: Prisma.ProfissionalAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateProfissional>
+        }
+        groupBy: {
+          args: Prisma.ProfissionalGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProfissionalGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ProfissionalCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProfissionalCountAggregateOutputType> | number
+        }
+      }
+    }
+    ProfissionalServico: {
+      payload: Prisma.$ProfissionalServicoPayload<ExtArgs>
+      fields: Prisma.ProfissionalServicoFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ProfissionalServicoFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfissionalServicoPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ProfissionalServicoFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfissionalServicoPayload>
+        }
+        findFirst: {
+          args: Prisma.ProfissionalServicoFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfissionalServicoPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ProfissionalServicoFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfissionalServicoPayload>
+        }
+        findMany: {
+          args: Prisma.ProfissionalServicoFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfissionalServicoPayload>[]
+        }
+        create: {
+          args: Prisma.ProfissionalServicoCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfissionalServicoPayload>
+        }
+        createMany: {
+          args: Prisma.ProfissionalServicoCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ProfissionalServicoCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfissionalServicoPayload>[]
+        }
+        delete: {
+          args: Prisma.ProfissionalServicoDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfissionalServicoPayload>
+        }
+        update: {
+          args: Prisma.ProfissionalServicoUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfissionalServicoPayload>
+        }
+        deleteMany: {
+          args: Prisma.ProfissionalServicoDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ProfissionalServicoUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ProfissionalServicoUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfissionalServicoPayload>[]
+        }
+        upsert: {
+          args: Prisma.ProfissionalServicoUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfissionalServicoPayload>
+        }
+        aggregate: {
+          args: Prisma.ProfissionalServicoAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateProfissionalServico>
+        }
+        groupBy: {
+          args: Prisma.ProfissionalServicoGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProfissionalServicoGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ProfissionalServicoCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProfissionalServicoCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -721,6 +871,27 @@ export const PetScalarFieldEnum = {
 } as const
 
 export type PetScalarFieldEnum = (typeof PetScalarFieldEnum)[keyof typeof PetScalarFieldEnum]
+
+
+export const ProfissionalScalarFieldEnum = {
+  id: 'id',
+  nome: 'nome',
+  email: 'email',
+  telefone: 'telefone',
+  ativo: 'ativo',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ProfissionalScalarFieldEnum = (typeof ProfissionalScalarFieldEnum)[keyof typeof ProfissionalScalarFieldEnum]
+
+
+export const ProfissionalServicoScalarFieldEnum = {
+  profissionalId: 'profissionalId',
+  servicoId: 'servicoId'
+} as const
+
+export type ProfissionalServicoScalarFieldEnum = (typeof ProfissionalServicoScalarFieldEnum)[keyof typeof ProfissionalServicoScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -983,6 +1154,8 @@ export type GlobalOmitConfig = {
   servico?: Prisma.ServicoOmit
   cliente?: Prisma.ClienteOmit
   pet?: Prisma.PetOmit
+  profissional?: Prisma.ProfissionalOmit
+  profissionalServico?: Prisma.ProfissionalServicoOmit
 }
 
 /* Types for Logging */

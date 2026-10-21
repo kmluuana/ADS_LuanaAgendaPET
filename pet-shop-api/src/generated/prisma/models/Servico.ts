@@ -248,6 +248,7 @@ export type ServicoWhereInput = {
   ativo?: Prisma.BoolFilter<"Servico"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Servico"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Servico"> | Date | string
+  profissionais?: Prisma.ProfissionalServicoListRelationFilter
 }
 
 export type ServicoOrderByWithRelationInput = {
@@ -259,6 +260,7 @@ export type ServicoOrderByWithRelationInput = {
   ativo?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  profissionais?: Prisma.ProfissionalServicoOrderByRelationAggregateInput
 }
 
 export type ServicoWhereUniqueInput = Prisma.AtLeast<{
@@ -273,6 +275,7 @@ export type ServicoWhereUniqueInput = Prisma.AtLeast<{
   ativo?: Prisma.BoolFilter<"Servico"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Servico"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Servico"> | Date | string
+  profissionais?: Prisma.ProfissionalServicoListRelationFilter
 }, "id">
 
 export type ServicoOrderByWithAggregationInput = {
@@ -313,6 +316,7 @@ export type ServicoCreateInput = {
   ativo?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  profissionais?: Prisma.ProfissionalServicoCreateNestedManyWithoutServicoInput
 }
 
 export type ServicoUncheckedCreateInput = {
@@ -324,6 +328,7 @@ export type ServicoUncheckedCreateInput = {
   ativo?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  profissionais?: Prisma.ProfissionalServicoUncheckedCreateNestedManyWithoutServicoInput
 }
 
 export type ServicoUpdateInput = {
@@ -334,6 +339,7 @@ export type ServicoUpdateInput = {
   ativo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  profissionais?: Prisma.ProfissionalServicoUpdateManyWithoutServicoNestedInput
 }
 
 export type ServicoUncheckedUpdateInput = {
@@ -345,6 +351,7 @@ export type ServicoUncheckedUpdateInput = {
   ativo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  profissionais?: Prisma.ProfissionalServicoUncheckedUpdateManyWithoutServicoNestedInput
 }
 
 export type ServicoCreateManyInput = {
@@ -424,6 +431,11 @@ export type ServicoSumOrderByAggregateInput = {
   duracao?: Prisma.SortOrder
 }
 
+export type ServicoScalarRelationFilter = {
+  is?: Prisma.ServicoWhereInput
+  isNot?: Prisma.ServicoWhereInput
+}
+
 export type StringFieldUpdateOperationsInput = {
   set?: string
 }
@@ -456,6 +468,107 @@ export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
 }
 
+export type ServicoCreateNestedOneWithoutProfissionaisInput = {
+  create?: Prisma.XOR<Prisma.ServicoCreateWithoutProfissionaisInput, Prisma.ServicoUncheckedCreateWithoutProfissionaisInput>
+  connectOrCreate?: Prisma.ServicoCreateOrConnectWithoutProfissionaisInput
+  connect?: Prisma.ServicoWhereUniqueInput
+}
+
+export type ServicoUpdateOneRequiredWithoutProfissionaisNestedInput = {
+  create?: Prisma.XOR<Prisma.ServicoCreateWithoutProfissionaisInput, Prisma.ServicoUncheckedCreateWithoutProfissionaisInput>
+  connectOrCreate?: Prisma.ServicoCreateOrConnectWithoutProfissionaisInput
+  upsert?: Prisma.ServicoUpsertWithoutProfissionaisInput
+  connect?: Prisma.ServicoWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ServicoUpdateToOneWithWhereWithoutProfissionaisInput, Prisma.ServicoUpdateWithoutProfissionaisInput>, Prisma.ServicoUncheckedUpdateWithoutProfissionaisInput>
+}
+
+export type ServicoCreateWithoutProfissionaisInput = {
+  nome: string
+  descricao?: string | null
+  preco: runtime.Decimal | runtime.DecimalJsLike | number | string
+  duracao: number
+  ativo?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type ServicoUncheckedCreateWithoutProfissionaisInput = {
+  id?: number
+  nome: string
+  descricao?: string | null
+  preco: runtime.Decimal | runtime.DecimalJsLike | number | string
+  duracao: number
+  ativo?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type ServicoCreateOrConnectWithoutProfissionaisInput = {
+  where: Prisma.ServicoWhereUniqueInput
+  create: Prisma.XOR<Prisma.ServicoCreateWithoutProfissionaisInput, Prisma.ServicoUncheckedCreateWithoutProfissionaisInput>
+}
+
+export type ServicoUpsertWithoutProfissionaisInput = {
+  update: Prisma.XOR<Prisma.ServicoUpdateWithoutProfissionaisInput, Prisma.ServicoUncheckedUpdateWithoutProfissionaisInput>
+  create: Prisma.XOR<Prisma.ServicoCreateWithoutProfissionaisInput, Prisma.ServicoUncheckedCreateWithoutProfissionaisInput>
+  where?: Prisma.ServicoWhereInput
+}
+
+export type ServicoUpdateToOneWithWhereWithoutProfissionaisInput = {
+  where?: Prisma.ServicoWhereInput
+  data: Prisma.XOR<Prisma.ServicoUpdateWithoutProfissionaisInput, Prisma.ServicoUncheckedUpdateWithoutProfissionaisInput>
+}
+
+export type ServicoUpdateWithoutProfissionaisInput = {
+  nome?: Prisma.StringFieldUpdateOperationsInput | string
+  descricao?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preco?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  duracao?: Prisma.IntFieldUpdateOperationsInput | number
+  ativo?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ServicoUncheckedUpdateWithoutProfissionaisInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  nome?: Prisma.StringFieldUpdateOperationsInput | string
+  descricao?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preco?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  duracao?: Prisma.IntFieldUpdateOperationsInput | number
+  ativo?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+
+/**
+ * Count Type ServicoCountOutputType
+ */
+
+export type ServicoCountOutputType = {
+  profissionais: number
+}
+
+export type ServicoCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  profissionais?: boolean | ServicoCountOutputTypeCountProfissionaisArgs
+}
+
+/**
+ * ServicoCountOutputType without action
+ */
+export type ServicoCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ServicoCountOutputType
+   */
+  select?: Prisma.ServicoCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * ServicoCountOutputType without action
+ */
+export type ServicoCountOutputTypeCountProfissionaisArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ProfissionalServicoWhereInput
+}
 
 
 export type ServicoSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -467,6 +580,8 @@ export type ServicoSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   ativo?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  profissionais?: boolean | Prisma.Servico$profissionaisArgs<ExtArgs>
+  _count?: boolean | Prisma.ServicoCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["servico"]>
 
 export type ServicoSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -503,10 +618,18 @@ export type ServicoSelectScalar = {
 }
 
 export type ServicoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nome" | "descricao" | "preco" | "duracao" | "ativo" | "createdAt" | "updatedAt", ExtArgs["result"]["servico"]>
+export type ServicoInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  profissionais?: boolean | Prisma.Servico$profissionaisArgs<ExtArgs>
+  _count?: boolean | Prisma.ServicoCountOutputTypeDefaultArgs<ExtArgs>
+}
+export type ServicoIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type ServicoIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
 
 export type $ServicoPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Servico"
-  objects: {}
+  objects: {
+    profissionais: Prisma.$ProfissionalServicoPayload<ExtArgs>[]
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     nome: string
@@ -910,6 +1033,7 @@ readonly fields: ServicoFieldRefs;
  */
 export interface Prisma__ServicoClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  profissionais<T extends Prisma.Servico$profissionaisArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Servico$profissionaisArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProfissionalServicoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -964,6 +1088,10 @@ export type ServicoFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Inter
    */
   omit?: Prisma.ServicoOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ServicoInclude<ExtArgs> | null
+  /**
    * Filter, which Servico to fetch.
    */
   where: Prisma.ServicoWhereUniqueInput
@@ -982,6 +1110,10 @@ export type ServicoFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extension
    */
   omit?: Prisma.ServicoOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ServicoInclude<ExtArgs> | null
+  /**
    * Filter, which Servico to fetch.
    */
   where: Prisma.ServicoWhereUniqueInput
@@ -999,6 +1131,10 @@ export type ServicoFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Omit specific fields from the Servico
    */
   omit?: Prisma.ServicoOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ServicoInclude<ExtArgs> | null
   /**
    * Filter, which Servico to fetch.
    */
@@ -1048,6 +1184,10 @@ export type ServicoFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions
    */
   omit?: Prisma.ServicoOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ServicoInclude<ExtArgs> | null
+  /**
    * Filter, which Servico to fetch.
    */
   where?: Prisma.ServicoWhereInput
@@ -1095,6 +1235,10 @@ export type ServicoFindManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Omit specific fields from the Servico
    */
   omit?: Prisma.ServicoOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ServicoInclude<ExtArgs> | null
   /**
    * Filter, which Servicos to fetch.
    */
@@ -1144,6 +1288,10 @@ export type ServicoCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    */
   omit?: Prisma.ServicoOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ServicoInclude<ExtArgs> | null
+  /**
    * The data needed to create a Servico.
    */
   data: Prisma.XOR<Prisma.ServicoCreateInput, Prisma.ServicoUncheckedCreateInput>
@@ -1191,6 +1339,10 @@ export type ServicoUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Omit specific fields from the Servico
    */
   omit?: Prisma.ServicoOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ServicoInclude<ExtArgs> | null
   /**
    * The data needed to update a Servico.
    */
@@ -1258,6 +1410,10 @@ export type ServicoUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    */
   omit?: Prisma.ServicoOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ServicoInclude<ExtArgs> | null
+  /**
    * The filter to search for the Servico to update in case it exists.
    */
   where: Prisma.ServicoWhereUniqueInput
@@ -1284,6 +1440,10 @@ export type ServicoDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    */
   omit?: Prisma.ServicoOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ServicoInclude<ExtArgs> | null
+  /**
    * Filter which Servico to delete.
    */
   where: Prisma.ServicoWhereUniqueInput
@@ -1304,6 +1464,30 @@ export type ServicoDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
 }
 
 /**
+ * Servico.profissionais
+ */
+export type Servico$profissionaisArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ProfissionalServico
+   */
+  select?: Prisma.ProfissionalServicoSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ProfissionalServico
+   */
+  omit?: Prisma.ProfissionalServicoOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProfissionalServicoInclude<ExtArgs> | null
+  where?: Prisma.ProfissionalServicoWhereInput
+  orderBy?: Prisma.ProfissionalServicoOrderByWithRelationInput | Prisma.ProfissionalServicoOrderByWithRelationInput[]
+  cursor?: Prisma.ProfissionalServicoWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ProfissionalServicoScalarFieldEnum | Prisma.ProfissionalServicoScalarFieldEnum[]
+}
+
+/**
  * Servico without action
  */
 export type ServicoDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1315,4 +1499,8 @@ export type ServicoDefaultArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Omit specific fields from the Servico
    */
   omit?: Prisma.ServicoOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ServicoInclude<ExtArgs> | null
 }

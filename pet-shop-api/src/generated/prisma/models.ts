@@ -11,4 +11,6 @@
 export type * from './models/Servico.ts'
 export type * from './models/Cliente.ts'
 export type * from './models/Pet.ts'
+export type * from './models/Profissional.ts'
+export type * from './models/ProfissionalServico.ts'
 export type * from './commonInputTypes.ts'

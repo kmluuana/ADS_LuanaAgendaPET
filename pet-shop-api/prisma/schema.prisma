@@ -18,6 +18,8 @@ model Servico {
   ativo     Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  profissionais ProfissionalServico[]
 }
 
 model Cliente {
@@ -46,4 +48,26 @@ model Pet {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Profissional {
+  id        Int      @id @default(autoincrement())
+  nome      String
+  email     String   @unique
+  telefone  String
+  ativo     Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  servicos ProfissionalServico[]
+}
+
+model ProfissionalServico {
+  profissionalId Int
+  servicoId      Int
+
+  profissional Profissional @relation(fields: [profissionalId], references: [id])
+  servico      Servico      @relation(fields: [servicoId], references: [id])
+
+  @@id([profissionalId, servicoId])
 }
