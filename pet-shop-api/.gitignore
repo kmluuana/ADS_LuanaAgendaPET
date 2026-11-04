@@ -12,12 +12,15 @@ coverage/
 .env.*
 !.env.example
 !.env.*.example
+
 *.pem
 *.key
 *.p12
 *.pfx
 *.jks
 *.keystore
+
+client_secret*.json
 
 # Logs and runtime files
 logs/
@@ -48,5 +51,6 @@ temp/
 .DS_Store
 Thumbs.db
 desktop.ini
+
 .vscode/
 .idea/

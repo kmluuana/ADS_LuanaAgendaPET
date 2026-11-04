@@ -55,7 +55,9 @@ export const ModelName = {
   Cliente: 'Cliente',
   Pet: 'Pet',
   Profissional: 'Profissional',
-  ProfissionalServico: 'ProfissionalServico'
+  ProfissionalServico: 'ProfissionalServico',
+  Agendamento: 'Agendamento',
+  Usuario: 'Usuario'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -136,6 +138,35 @@ export const ProfissionalServicoScalarFieldEnum = {
 } as const
 
 export type ProfissionalServicoScalarFieldEnum = (typeof ProfissionalServicoScalarFieldEnum)[keyof typeof ProfissionalServicoScalarFieldEnum]
+
+
+export const AgendamentoScalarFieldEnum = {
+  id: 'id',
+  dataHora: 'dataHora',
+  status: 'status',
+  observacoes: 'observacoes',
+  petId: 'petId',
+  servicoId: 'servicoId',
+  profissionalId: 'profissionalId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AgendamentoScalarFieldEnum = (typeof AgendamentoScalarFieldEnum)[keyof typeof AgendamentoScalarFieldEnum]
+
+
+export const UsuarioScalarFieldEnum = {
+  id: 'id',
+  googleId: 'googleId',
+  nome: 'nome',
+  email: 'email',
+  perfil: 'perfil',
+  ativo: 'ativo',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UsuarioScalarFieldEnum = (typeof UsuarioScalarFieldEnum)[keyof typeof UsuarioScalarFieldEnum]
 
 
 export const SortOrder = {

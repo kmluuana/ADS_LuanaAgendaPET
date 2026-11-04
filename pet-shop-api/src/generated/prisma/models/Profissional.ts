@@ -233,6 +233,7 @@ export type ProfissionalWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"Profissional"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Profissional"> | Date | string
   servicos?: Prisma.ProfissionalServicoListRelationFilter
+  agendamentos?: Prisma.AgendamentoListRelationFilter
 }
 
 export type ProfissionalOrderByWithRelationInput = {
@@ -244,6 +245,7 @@ export type ProfissionalOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   servicos?: Prisma.ProfissionalServicoOrderByRelationAggregateInput
+  agendamentos?: Prisma.AgendamentoOrderByRelationAggregateInput
 }
 
 export type ProfissionalWhereUniqueInput = Prisma.AtLeast<{
@@ -258,6 +260,7 @@ export type ProfissionalWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"Profissional"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Profissional"> | Date | string
   servicos?: Prisma.ProfissionalServicoListRelationFilter
+  agendamentos?: Prisma.AgendamentoListRelationFilter
 }, "id" | "email">
 
 export type ProfissionalOrderByWithAggregationInput = {
@@ -296,6 +299,7 @@ export type ProfissionalCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   servicos?: Prisma.ProfissionalServicoCreateNestedManyWithoutProfissionalInput
+  agendamentos?: Prisma.AgendamentoCreateNestedManyWithoutProfissionalInput
 }
 
 export type ProfissionalUncheckedCreateInput = {
@@ -307,6 +311,7 @@ export type ProfissionalUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   servicos?: Prisma.ProfissionalServicoUncheckedCreateNestedManyWithoutProfissionalInput
+  agendamentos?: Prisma.AgendamentoUncheckedCreateNestedManyWithoutProfissionalInput
 }
 
 export type ProfissionalUpdateInput = {
@@ -317,6 +322,7 @@ export type ProfissionalUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   servicos?: Prisma.ProfissionalServicoUpdateManyWithoutProfissionalNestedInput
+  agendamentos?: Prisma.AgendamentoUpdateManyWithoutProfissionalNestedInput
 }
 
 export type ProfissionalUncheckedUpdateInput = {
@@ -328,6 +334,7 @@ export type ProfissionalUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   servicos?: Prisma.ProfissionalServicoUncheckedUpdateManyWithoutProfissionalNestedInput
+  agendamentos?: Prisma.AgendamentoUncheckedUpdateManyWithoutProfissionalNestedInput
 }
 
 export type ProfissionalCreateManyInput = {
@@ -416,6 +423,20 @@ export type ProfissionalUpdateOneRequiredWithoutServicosNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ProfissionalUpdateToOneWithWhereWithoutServicosInput, Prisma.ProfissionalUpdateWithoutServicosInput>, Prisma.ProfissionalUncheckedUpdateWithoutServicosInput>
 }
 
+export type ProfissionalCreateNestedOneWithoutAgendamentosInput = {
+  create?: Prisma.XOR<Prisma.ProfissionalCreateWithoutAgendamentosInput, Prisma.ProfissionalUncheckedCreateWithoutAgendamentosInput>
+  connectOrCreate?: Prisma.ProfissionalCreateOrConnectWithoutAgendamentosInput
+  connect?: Prisma.ProfissionalWhereUniqueInput
+}
+
+export type ProfissionalUpdateOneRequiredWithoutAgendamentosNestedInput = {
+  create?: Prisma.XOR<Prisma.ProfissionalCreateWithoutAgendamentosInput, Prisma.ProfissionalUncheckedCreateWithoutAgendamentosInput>
+  connectOrCreate?: Prisma.ProfissionalCreateOrConnectWithoutAgendamentosInput
+  upsert?: Prisma.ProfissionalUpsertWithoutAgendamentosInput
+  connect?: Prisma.ProfissionalWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProfissionalUpdateToOneWithWhereWithoutAgendamentosInput, Prisma.ProfissionalUpdateWithoutAgendamentosInput>, Prisma.ProfissionalUncheckedUpdateWithoutAgendamentosInput>
+}
+
 export type ProfissionalCreateWithoutServicosInput = {
   nome: string
   email: string
@@ -423,6 +444,7 @@ export type ProfissionalCreateWithoutServicosInput = {
   ativo?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  agendamentos?: Prisma.AgendamentoCreateNestedManyWithoutProfissionalInput
 }
 
 export type ProfissionalUncheckedCreateWithoutServicosInput = {
@@ -433,6 +455,7 @@ export type ProfissionalUncheckedCreateWithoutServicosInput = {
   ativo?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  agendamentos?: Prisma.AgendamentoUncheckedCreateNestedManyWithoutProfissionalInput
 }
 
 export type ProfissionalCreateOrConnectWithoutServicosInput = {
@@ -458,6 +481,7 @@ export type ProfissionalUpdateWithoutServicosInput = {
   ativo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  agendamentos?: Prisma.AgendamentoUpdateManyWithoutProfissionalNestedInput
 }
 
 export type ProfissionalUncheckedUpdateWithoutServicosInput = {
@@ -468,6 +492,65 @@ export type ProfissionalUncheckedUpdateWithoutServicosInput = {
   ativo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  agendamentos?: Prisma.AgendamentoUncheckedUpdateManyWithoutProfissionalNestedInput
+}
+
+export type ProfissionalCreateWithoutAgendamentosInput = {
+  nome: string
+  email: string
+  telefone: string
+  ativo?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  servicos?: Prisma.ProfissionalServicoCreateNestedManyWithoutProfissionalInput
+}
+
+export type ProfissionalUncheckedCreateWithoutAgendamentosInput = {
+  id?: number
+  nome: string
+  email: string
+  telefone: string
+  ativo?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  servicos?: Prisma.ProfissionalServicoUncheckedCreateNestedManyWithoutProfissionalInput
+}
+
+export type ProfissionalCreateOrConnectWithoutAgendamentosInput = {
+  where: Prisma.ProfissionalWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProfissionalCreateWithoutAgendamentosInput, Prisma.ProfissionalUncheckedCreateWithoutAgendamentosInput>
+}
+
+export type ProfissionalUpsertWithoutAgendamentosInput = {
+  update: Prisma.XOR<Prisma.ProfissionalUpdateWithoutAgendamentosInput, Prisma.ProfissionalUncheckedUpdateWithoutAgendamentosInput>
+  create: Prisma.XOR<Prisma.ProfissionalCreateWithoutAgendamentosInput, Prisma.ProfissionalUncheckedCreateWithoutAgendamentosInput>
+  where?: Prisma.ProfissionalWhereInput
+}
+
+export type ProfissionalUpdateToOneWithWhereWithoutAgendamentosInput = {
+  where?: Prisma.ProfissionalWhereInput
+  data: Prisma.XOR<Prisma.ProfissionalUpdateWithoutAgendamentosInput, Prisma.ProfissionalUncheckedUpdateWithoutAgendamentosInput>
+}
+
+export type ProfissionalUpdateWithoutAgendamentosInput = {
+  nome?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  telefone?: Prisma.StringFieldUpdateOperationsInput | string
+  ativo?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  servicos?: Prisma.ProfissionalServicoUpdateManyWithoutProfissionalNestedInput
+}
+
+export type ProfissionalUncheckedUpdateWithoutAgendamentosInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  nome?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  telefone?: Prisma.StringFieldUpdateOperationsInput | string
+  ativo?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  servicos?: Prisma.ProfissionalServicoUncheckedUpdateManyWithoutProfissionalNestedInput
 }
 
 
@@ -477,10 +560,12 @@ export type ProfissionalUncheckedUpdateWithoutServicosInput = {
 
 export type ProfissionalCountOutputType = {
   servicos: number
+  agendamentos: number
 }
 
 export type ProfissionalCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   servicos?: boolean | ProfissionalCountOutputTypeCountServicosArgs
+  agendamentos?: boolean | ProfissionalCountOutputTypeCountAgendamentosArgs
 }
 
 /**
@@ -500,6 +585,13 @@ export type ProfissionalCountOutputTypeCountServicosArgs<ExtArgs extends runtime
   where?: Prisma.ProfissionalServicoWhereInput
 }
 
+/**
+ * ProfissionalCountOutputType without action
+ */
+export type ProfissionalCountOutputTypeCountAgendamentosArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AgendamentoWhereInput
+}
+
 
 export type ProfissionalSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -510,6 +602,7 @@ export type ProfissionalSelect<ExtArgs extends runtime.Types.Extensions.Internal
   createdAt?: boolean
   updatedAt?: boolean
   servicos?: boolean | Prisma.Profissional$servicosArgs<ExtArgs>
+  agendamentos?: boolean | Prisma.Profissional$agendamentosArgs<ExtArgs>
   _count?: boolean | Prisma.ProfissionalCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["profissional"]>
 
@@ -546,6 +639,7 @@ export type ProfissionalSelectScalar = {
 export type ProfissionalOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nome" | "email" | "telefone" | "ativo" | "createdAt" | "updatedAt", ExtArgs["result"]["profissional"]>
 export type ProfissionalInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   servicos?: boolean | Prisma.Profissional$servicosArgs<ExtArgs>
+  agendamentos?: boolean | Prisma.Profissional$agendamentosArgs<ExtArgs>
   _count?: boolean | Prisma.ProfissionalCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ProfissionalIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -555,6 +649,7 @@ export type $ProfissionalPayload<ExtArgs extends runtime.Types.Extensions.Intern
   name: "Profissional"
   objects: {
     servicos: Prisma.$ProfissionalServicoPayload<ExtArgs>[]
+    agendamentos: Prisma.$AgendamentoPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -959,6 +1054,7 @@ readonly fields: ProfissionalFieldRefs;
 export interface Prisma__ProfissionalClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   servicos<T extends Prisma.Profissional$servicosArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Profissional$servicosArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProfissionalServicoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  agendamentos<T extends Prisma.Profissional$agendamentosArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Profissional$agendamentosArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AgendamentoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1409,6 +1505,30 @@ export type Profissional$servicosArgs<ExtArgs extends runtime.Types.Extensions.I
   take?: number
   skip?: number
   distinct?: Prisma.ProfissionalServicoScalarFieldEnum | Prisma.ProfissionalServicoScalarFieldEnum[]
+}
+
+/**
+ * Profissional.agendamentos
+ */
+export type Profissional$agendamentosArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Agendamento
+   */
+  select?: Prisma.AgendamentoSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Agendamento
+   */
+  omit?: Prisma.AgendamentoOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AgendamentoInclude<ExtArgs> | null
+  where?: Prisma.AgendamentoWhereInput
+  orderBy?: Prisma.AgendamentoOrderByWithRelationInput | Prisma.AgendamentoOrderByWithRelationInput[]
+  cursor?: Prisma.AgendamentoWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AgendamentoScalarFieldEnum | Prisma.AgendamentoScalarFieldEnum[]
 }
 
 /**

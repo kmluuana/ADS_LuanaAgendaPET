@@ -202,6 +202,40 @@ export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedDateTimeNullableFilter<$PrismaModel>
 }
 
+export type EnumStatusAgendamentoFilter<$PrismaModel = never> = {
+  equals?: $Enums.StatusAgendamento | Prisma.EnumStatusAgendamentoFieldRefInput<$PrismaModel>
+  in?: $Enums.StatusAgendamento[] | Prisma.ListEnumStatusAgendamentoFieldRefInput<$PrismaModel>
+  notIn?: $Enums.StatusAgendamento[] | Prisma.ListEnumStatusAgendamentoFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumStatusAgendamentoFilter<$PrismaModel> | $Enums.StatusAgendamento
+}
+
+export type EnumStatusAgendamentoWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.StatusAgendamento | Prisma.EnumStatusAgendamentoFieldRefInput<$PrismaModel>
+  in?: $Enums.StatusAgendamento[] | Prisma.ListEnumStatusAgendamentoFieldRefInput<$PrismaModel>
+  notIn?: $Enums.StatusAgendamento[] | Prisma.ListEnumStatusAgendamentoFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumStatusAgendamentoWithAggregatesFilter<$PrismaModel> | $Enums.StatusAgendamento
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumStatusAgendamentoFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumStatusAgendamentoFilter<$PrismaModel>
+}
+
+export type EnumPerfilUsuarioFilter<$PrismaModel = never> = {
+  equals?: $Enums.PerfilUsuario | Prisma.EnumPerfilUsuarioFieldRefInput<$PrismaModel>
+  in?: $Enums.PerfilUsuario[] | Prisma.ListEnumPerfilUsuarioFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PerfilUsuario[] | Prisma.ListEnumPerfilUsuarioFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPerfilUsuarioFilter<$PrismaModel> | $Enums.PerfilUsuario
+}
+
+export type EnumPerfilUsuarioWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PerfilUsuario | Prisma.EnumPerfilUsuarioFieldRefInput<$PrismaModel>
+  in?: $Enums.PerfilUsuario[] | Prisma.ListEnumPerfilUsuarioFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PerfilUsuario[] | Prisma.ListEnumPerfilUsuarioFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPerfilUsuarioWithAggregatesFilter<$PrismaModel> | $Enums.PerfilUsuario
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPerfilUsuarioFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPerfilUsuarioFilter<$PrismaModel>
+}
+
 export type NestedIntFilter<$PrismaModel = never> = {
   equals?: number | Prisma.IntFieldRefInput<$PrismaModel>
   in?: number[] | Prisma.ListIntFieldRefInput<$PrismaModel>
@@ -401,6 +435,40 @@ export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
   _min?: Prisma.NestedDateTimeNullableFilter<$PrismaModel>
   _max?: Prisma.NestedDateTimeNullableFilter<$PrismaModel>
+}
+
+export type NestedEnumStatusAgendamentoFilter<$PrismaModel = never> = {
+  equals?: $Enums.StatusAgendamento | Prisma.EnumStatusAgendamentoFieldRefInput<$PrismaModel>
+  in?: $Enums.StatusAgendamento[] | Prisma.ListEnumStatusAgendamentoFieldRefInput<$PrismaModel>
+  notIn?: $Enums.StatusAgendamento[] | Prisma.ListEnumStatusAgendamentoFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumStatusAgendamentoFilter<$PrismaModel> | $Enums.StatusAgendamento
+}
+
+export type NestedEnumStatusAgendamentoWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.StatusAgendamento | Prisma.EnumStatusAgendamentoFieldRefInput<$PrismaModel>
+  in?: $Enums.StatusAgendamento[] | Prisma.ListEnumStatusAgendamentoFieldRefInput<$PrismaModel>
+  notIn?: $Enums.StatusAgendamento[] | Prisma.ListEnumStatusAgendamentoFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumStatusAgendamentoWithAggregatesFilter<$PrismaModel> | $Enums.StatusAgendamento
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumStatusAgendamentoFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumStatusAgendamentoFilter<$PrismaModel>
+}
+
+export type NestedEnumPerfilUsuarioFilter<$PrismaModel = never> = {
+  equals?: $Enums.PerfilUsuario | Prisma.EnumPerfilUsuarioFieldRefInput<$PrismaModel>
+  in?: $Enums.PerfilUsuario[] | Prisma.ListEnumPerfilUsuarioFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PerfilUsuario[] | Prisma.ListEnumPerfilUsuarioFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPerfilUsuarioFilter<$PrismaModel> | $Enums.PerfilUsuario
+}
+
+export type NestedEnumPerfilUsuarioWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PerfilUsuario | Prisma.EnumPerfilUsuarioFieldRefInput<$PrismaModel>
+  in?: $Enums.PerfilUsuario[] | Prisma.ListEnumPerfilUsuarioFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PerfilUsuario[] | Prisma.ListEnumPerfilUsuarioFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPerfilUsuarioWithAggregatesFilter<$PrismaModel> | $Enums.PerfilUsuario
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPerfilUsuarioFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPerfilUsuarioFilter<$PrismaModel>
 }
 
 

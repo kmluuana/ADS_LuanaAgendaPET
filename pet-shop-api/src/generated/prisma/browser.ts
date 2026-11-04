@@ -42,3 +42,13 @@ export type Profissional = Prisma.ProfissionalModel
  * 
  */
 export type ProfissionalServico = Prisma.ProfissionalServicoModel
+/**
+ * Model Agendamento
+ * 
+ */
+export type Agendamento = Prisma.AgendamentoModel
+/**
+ * Model Usuario
+ * 
+ */
+export type Usuario = Prisma.UsuarioModel

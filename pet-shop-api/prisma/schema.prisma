@@ -9,6 +9,12 @@ datasource db {
   provider = "postgresql"
 }
 
+enum StatusAgendamento {
+  AGENDADO
+  CONCLUIDO
+  CANCELADO
+}
+
 model Servico {
   id        Int      @id @default(autoincrement())
   nome      String
@@ -20,6 +26,7 @@ model Servico {
   updatedAt DateTime @updatedAt
 
   profissionais ProfissionalServico[]
+  agendamentos  Agendamento[]
 }
 
 model Cliente {
@@ -48,6 +55,8 @@ model Pet {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  agendamentos Agendamento[]
 }
 
 model Profissional {
@@ -59,7 +68,8 @@ model Profissional {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  servicos ProfissionalServico[]
+  servicos     ProfissionalServico[]
+  agendamentos Agendamento[]
 }
 
 model ProfissionalServico {
@@ -70,4 +80,40 @@ model ProfissionalServico {
   servico      Servico      @relation(fields: [servicoId], references: [id])
 
   @@id([profissionalId, servicoId])
+}
+
+model Agendamento {
+  id          Int               @id @default(autoincrement())
+  dataHora    DateTime
+  status      StatusAgendamento @default(AGENDADO)
+  observacoes String?
+
+  petId          Int
+  servicoId      Int
+  profissionalId Int
+
+  pet          Pet          @relation(fields: [petId], references: [id])
+  servico      Servico      @relation(fields: [servicoId], references: [id])
+  profissional Profissional @relation(fields: [profissionalId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum PerfilUsuario {
+  CLIENTE
+  ATENDENTE
+  ADMINISTRADOR
+}
+
+model Usuario {
+  id       Int           @id @default(autoincrement())
+  googleId String        @unique
+  nome     String
+  email    String        @unique
+  perfil   PerfilUsuario @default(CLIENTE)
+  ativo    Boolean       @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
