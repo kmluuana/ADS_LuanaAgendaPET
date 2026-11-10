@@ -2,16 +2,25 @@ import { db } from "../prisma/db";
 
 export async function obterUsuarioPorGoogleId(googleId: string) {
   return db.usuario.findUnique({
-    where: {
-      googleId,
-    },
+    where: { googleId },
   });
 }
 
 export async function obterUsuarioPorEmail(email: string) {
   return db.usuario.findUnique({
-    where: {
-      email,
+    where: { email },
+  });
+}
+
+export async function obterUsuarioPorId(id: number) {
+  return db.usuario.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      nome: true,
+      email: true,
+      perfil: true,
+      ativo: true,
     },
   });
 }
@@ -38,9 +47,7 @@ export async function atualizarDadosGoogle(
   },
 ) {
   return db.usuario.update({
-    where: {
-      id,
-    },
+    where: { id },
     data: {
       nome: dados.nome,
       email: dados.email,
@@ -53,12 +60,8 @@ export async function atualizarPerfilUsuario(
   perfil: "CLIENTE" | "ATENDENTE" | "ADMINISTRADOR",
 ) {
   return db.usuario.update({
-    where: {
-      id,
-    },
-    data: {
-      perfil,
-    },
+    where: { id },
+    data: { perfil },
   });
 }
 
@@ -67,11 +70,7 @@ export async function atualizarStatusUsuario(
   ativo: boolean,
 ) {
   return db.usuario.update({
-    where: {
-      id,
-    },
-    data: {
-      ativo,
-    },
+    where: { id },
+    data: { ativo },
   });
 }

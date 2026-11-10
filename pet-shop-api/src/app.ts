@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 
 import clienteRoutes from "./clientes/cliente.routes";
 import petRoutes from "./pets/pet.routes";
@@ -14,10 +15,12 @@ const app = express();
 app.use(
   cors({
     origin: "http://localhost:5173",
+    credentials: true,
   }),
 );
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.use("/pets", petRoutes);
 app.use("/clientes", clienteRoutes);

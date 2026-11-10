@@ -9,6 +9,7 @@ declare global {
             client_id: string;
             callback: (response: { credential: string }) => void;
           }) => void;
+
           renderButton: (
             element: HTMLElement,
             options: {
@@ -37,12 +38,14 @@ export default function LoginPage() {
 
       window.google.accounts.id.initialize({
         client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+
         callback: async (response) => {
           try {
             const apiResponse = await fetch(
               `${import.meta.env.VITE_API_URL}/auth/google`,
               {
                 method: "POST",
+                credentials: "include",
                 headers: {
                   "Content-Type": "application/json",
                 },
