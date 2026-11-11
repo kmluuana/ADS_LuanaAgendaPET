@@ -4,6 +4,17 @@ export async function listarPets() {
   return db.pet.findMany();
 }
 
+export async function listarPetsPorCliente(clienteId: number) {
+  return db.pet.findMany({
+    where: {
+      clienteId,
+    },
+    orderBy: {
+      nome: "asc",
+    },
+  });
+}
+
 export async function obterPetPorId(id: number) {
   return db.pet.findUnique({
     where: {
@@ -58,7 +69,10 @@ export async function atualizarPet(
   });
 }
 
-export async function atualizarStatusPet(id: number, ativo: boolean) {
+export async function atualizarStatusPet(
+  id: number,
+  ativo: boolean,
+) {
   return db.pet.update({
     where: {
       id,

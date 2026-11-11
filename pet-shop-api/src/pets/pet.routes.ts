@@ -1,55 +1,75 @@
 import { Router } from "express";
 
+import { exigirAutenticacao } from "../auth/auth.middleware";
+
 import {
-  alterarStatusPet,
-  buscarPetPorId,
-  buscarPets,
-  cadastrarPet,
-  editarPet,
+  alterarStatusPetDoUsuario,
+  buscarPetDoUsuario,
+  cadastrarPetDoUsuario,
+  editarPetDoUsuario,
+  listarPetsDoUsuario,
 } from "./pet.service";
 
 const router = Router();
 
-router.get("/", async (_request, response, next) => {
+router.get("/", exigirAutenticacao, async (_request, response) => {
   try {
-    const pets = await buscarPets();
+    const { id, perfil } = response.locals.auth;
+
+    const pets = await listarPetsDoUsuario(id, perfil);
 
     response.json(pets);
   } catch (error) {
-    next(error);
+    if (error instanceof Error) {
+      response.status(400).json({
+        message: error.message,
+      });
+
+      return;
+    }
+
+    response.status(500).json({
+      message: "Erro interno ao listar pets",
+    });
   }
 });
 
-router.get("/:id", async (request, response, next) => {
+router.get("/:id", exigirAutenticacao, async (request, response) => {
   try {
-    const id = Number(request.params.id);
+    const petId = Number(request.params.id);
+    const { id: usuarioId, perfil } = response.locals.auth;
 
-    if (!Number.isInteger(id) || id <= 0) {
-      response.status(400).json({
-        message: "Id inválido",
-      });
-
-      return;
-    }
-
-    const pet = await buscarPetPorId(id);
-
-    if (!pet) {
-      response.status(404).json({
-        message: "Pet não encontrado",
-      });
-
-      return;
-    }
+    const pet = await buscarPetDoUsuario(
+      petId,
+      usuarioId,
+      perfil,
+    );
 
     response.json(pet);
   } catch (error) {
-    next(error);
+    if (error instanceof Error) {
+      const status =
+        error.message === "Pet não encontrado"
+          ? 404
+          : 400;
+
+      response.status(status).json({
+        message: error.message,
+      });
+
+      return;
+    }
+
+    response.status(500).json({
+      message: "Erro interno ao consultar pet",
+    });
   }
 });
 
-router.post("/", async (request, response, next) => {
+router.post("/", exigirAutenticacao, async (request, response) => {
   try {
+    const { id: usuarioId, perfil } = response.locals.auth;
+
     const {
       nome,
       especie,
@@ -59,16 +79,22 @@ router.post("/", async (request, response, next) => {
       clienteId,
     } = request.body;
 
-    const pet = await cadastrarPet({
-      nome,
-      especie,
-      raca,
-      dataNascimento: dataNascimento
-        ? new Date(dataNascimento)
-        : undefined,
-      observacoes,
-      clienteId,
-    });
+    const pet = await cadastrarPetDoUsuario(
+      usuarioId,
+      perfil,
+      {
+        nome,
+        especie,
+        raca,
+        dataNascimento: dataNascimento
+          ? new Date(dataNascimento)
+          : undefined,
+        observacoes,
+        clienteId: clienteId
+          ? Number(clienteId)
+          : undefined,
+      },
+    );
 
     response.status(201).json(pet);
   } catch (error) {
@@ -80,21 +106,16 @@ router.post("/", async (request, response, next) => {
       return;
     }
 
-    next(error);
+    response.status(500).json({
+      message: "Erro interno ao cadastrar pet",
+    });
   }
 });
 
-router.put("/:id", async (request, response, next) => {
+router.put("/:id", exigirAutenticacao, async (request, response) => {
   try {
-    const id = Number(request.params.id);
-
-    if (!Number.isInteger(id) || id <= 0) {
-      response.status(400).json({
-        message: "Id inválido",
-      });
-
-      return;
-    }
+    const petId = Number(request.params.id);
+    const { id: usuarioId, perfil } = response.locals.auth;
 
     const {
       nome,
@@ -105,75 +126,81 @@ router.put("/:id", async (request, response, next) => {
       clienteId,
     } = request.body;
 
-    const pet = await editarPet(id, {
-      nome,
-      especie,
-      raca,
-      dataNascimento: dataNascimento
-        ? new Date(dataNascimento)
-        : undefined,
-      observacoes,
-      clienteId,
-    });
-
-    if (!pet) {
-      response.status(404).json({
-        message: "Pet não encontrado",
-      });
-
-      return;
-    }
+    const pet = await editarPetDoUsuario(
+      petId,
+      usuarioId,
+      perfil,
+      {
+        nome,
+        especie,
+        raca,
+        dataNascimento: dataNascimento
+          ? new Date(dataNascimento)
+          : undefined,
+        observacoes,
+        clienteId: clienteId
+          ? Number(clienteId)
+          : undefined,
+      },
+    );
 
     response.json(pet);
   } catch (error) {
     if (error instanceof Error) {
-      response.status(400).json({
+      const status =
+        error.message === "Pet não encontrado"
+          ? 404
+          : 400;
+
+      response.status(status).json({
         message: error.message,
       });
 
       return;
     }
 
-    next(error);
+    response.status(500).json({
+      message: "Erro interno ao atualizar pet",
+    });
   }
 });
 
-router.patch("/:id/ativo", async (request, response, next) => {
-  try {
-    const id = Number(request.params.id);
+router.patch(
+  "/:id/ativo",
+  exigirAutenticacao,
+  async (request, response) => {
+    try {
+      const petId = Number(request.params.id);
+      const { id: usuarioId, perfil } = response.locals.auth;
+      const { ativo } = request.body;
 
-    if (!Number.isInteger(id) || id <= 0) {
-      response.status(400).json({
-        message: "Id inválido",
+      const pet = await alterarStatusPetDoUsuario(
+        petId,
+        usuarioId,
+        perfil,
+        ativo,
+      );
+
+      response.json(pet);
+    } catch (error) {
+      if (error instanceof Error) {
+        const status =
+          error.message === "Pet não encontrado"
+            ? 404
+            : 400;
+
+        response.status(status).json({
+          message: error.message,
+        });
+
+        return;
+      }
+
+      response.status(500).json({
+        message: "Erro interno ao alterar status do pet",
       });
-
-      return;
     }
-
-    const { ativo } = request.body;
-
-    if (typeof ativo !== "boolean") {
-      response.status(400).json({
-        message: "O campo ativo deve ser true ou false",
-      });
-
-      return;
-    }
-
-    const pet = await alterarStatusPet(id, ativo);
-
-    if (!pet) {
-      response.status(404).json({
-        message: "Pet não encontrado",
-      });
-
-      return;
-    }
-
-    response.json(pet);
-  } catch (error) {
-    next(error);
-  }
-});
+  },
+);
 
 export default router;

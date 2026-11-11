@@ -233,6 +233,7 @@ export type ClienteWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"Cliente"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Cliente"> | Date | string
   pets?: Prisma.PetListRelationFilter
+  usuario?: Prisma.XOR<Prisma.UsuarioNullableScalarRelationFilter, Prisma.UsuarioWhereInput> | null
 }
 
 export type ClienteOrderByWithRelationInput = {
@@ -244,6 +245,7 @@ export type ClienteOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   pets?: Prisma.PetOrderByRelationAggregateInput
+  usuario?: Prisma.UsuarioOrderByWithRelationInput
 }
 
 export type ClienteWhereUniqueInput = Prisma.AtLeast<{
@@ -258,6 +260,7 @@ export type ClienteWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"Cliente"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Cliente"> | Date | string
   pets?: Prisma.PetListRelationFilter
+  usuario?: Prisma.XOR<Prisma.UsuarioNullableScalarRelationFilter, Prisma.UsuarioWhereInput> | null
 }, "id" | "email">
 
 export type ClienteOrderByWithAggregationInput = {
@@ -296,6 +299,7 @@ export type ClienteCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pets?: Prisma.PetCreateNestedManyWithoutClienteInput
+  usuario?: Prisma.UsuarioCreateNestedOneWithoutClienteInput
 }
 
 export type ClienteUncheckedCreateInput = {
@@ -307,6 +311,7 @@ export type ClienteUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pets?: Prisma.PetUncheckedCreateNestedManyWithoutClienteInput
+  usuario?: Prisma.UsuarioUncheckedCreateNestedOneWithoutClienteInput
 }
 
 export type ClienteUpdateInput = {
@@ -317,6 +322,7 @@ export type ClienteUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pets?: Prisma.PetUpdateManyWithoutClienteNestedInput
+  usuario?: Prisma.UsuarioUpdateOneWithoutClienteNestedInput
 }
 
 export type ClienteUncheckedUpdateInput = {
@@ -328,6 +334,7 @@ export type ClienteUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pets?: Prisma.PetUncheckedUpdateManyWithoutClienteNestedInput
+  usuario?: Prisma.UsuarioUncheckedUpdateOneWithoutClienteNestedInput
 }
 
 export type ClienteCreateManyInput = {
@@ -402,6 +409,11 @@ export type ClienteScalarRelationFilter = {
   isNot?: Prisma.ClienteWhereInput
 }
 
+export type ClienteNullableScalarRelationFilter = {
+  is?: Prisma.ClienteWhereInput | null
+  isNot?: Prisma.ClienteWhereInput | null
+}
+
 export type ClienteCreateNestedOneWithoutPetsInput = {
   create?: Prisma.XOR<Prisma.ClienteCreateWithoutPetsInput, Prisma.ClienteUncheckedCreateWithoutPetsInput>
   connectOrCreate?: Prisma.ClienteCreateOrConnectWithoutPetsInput
@@ -416,6 +428,22 @@ export type ClienteUpdateOneRequiredWithoutPetsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ClienteUpdateToOneWithWhereWithoutPetsInput, Prisma.ClienteUpdateWithoutPetsInput>, Prisma.ClienteUncheckedUpdateWithoutPetsInput>
 }
 
+export type ClienteCreateNestedOneWithoutUsuarioInput = {
+  create?: Prisma.XOR<Prisma.ClienteCreateWithoutUsuarioInput, Prisma.ClienteUncheckedCreateWithoutUsuarioInput>
+  connectOrCreate?: Prisma.ClienteCreateOrConnectWithoutUsuarioInput
+  connect?: Prisma.ClienteWhereUniqueInput
+}
+
+export type ClienteUpdateOneWithoutUsuarioNestedInput = {
+  create?: Prisma.XOR<Prisma.ClienteCreateWithoutUsuarioInput, Prisma.ClienteUncheckedCreateWithoutUsuarioInput>
+  connectOrCreate?: Prisma.ClienteCreateOrConnectWithoutUsuarioInput
+  upsert?: Prisma.ClienteUpsertWithoutUsuarioInput
+  disconnect?: Prisma.ClienteWhereInput | boolean
+  delete?: Prisma.ClienteWhereInput | boolean
+  connect?: Prisma.ClienteWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ClienteUpdateToOneWithWhereWithoutUsuarioInput, Prisma.ClienteUpdateWithoutUsuarioInput>, Prisma.ClienteUncheckedUpdateWithoutUsuarioInput>
+}
+
 export type ClienteCreateWithoutPetsInput = {
   nome: string
   email: string
@@ -423,6 +451,7 @@ export type ClienteCreateWithoutPetsInput = {
   ativo?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  usuario?: Prisma.UsuarioCreateNestedOneWithoutClienteInput
 }
 
 export type ClienteUncheckedCreateWithoutPetsInput = {
@@ -433,6 +462,7 @@ export type ClienteUncheckedCreateWithoutPetsInput = {
   ativo?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  usuario?: Prisma.UsuarioUncheckedCreateNestedOneWithoutClienteInput
 }
 
 export type ClienteCreateOrConnectWithoutPetsInput = {
@@ -458,6 +488,7 @@ export type ClienteUpdateWithoutPetsInput = {
   ativo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  usuario?: Prisma.UsuarioUpdateOneWithoutClienteNestedInput
 }
 
 export type ClienteUncheckedUpdateWithoutPetsInput = {
@@ -468,6 +499,65 @@ export type ClienteUncheckedUpdateWithoutPetsInput = {
   ativo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  usuario?: Prisma.UsuarioUncheckedUpdateOneWithoutClienteNestedInput
+}
+
+export type ClienteCreateWithoutUsuarioInput = {
+  nome: string
+  email: string
+  telefone: string
+  ativo?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  pets?: Prisma.PetCreateNestedManyWithoutClienteInput
+}
+
+export type ClienteUncheckedCreateWithoutUsuarioInput = {
+  id?: number
+  nome: string
+  email: string
+  telefone: string
+  ativo?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  pets?: Prisma.PetUncheckedCreateNestedManyWithoutClienteInput
+}
+
+export type ClienteCreateOrConnectWithoutUsuarioInput = {
+  where: Prisma.ClienteWhereUniqueInput
+  create: Prisma.XOR<Prisma.ClienteCreateWithoutUsuarioInput, Prisma.ClienteUncheckedCreateWithoutUsuarioInput>
+}
+
+export type ClienteUpsertWithoutUsuarioInput = {
+  update: Prisma.XOR<Prisma.ClienteUpdateWithoutUsuarioInput, Prisma.ClienteUncheckedUpdateWithoutUsuarioInput>
+  create: Prisma.XOR<Prisma.ClienteCreateWithoutUsuarioInput, Prisma.ClienteUncheckedCreateWithoutUsuarioInput>
+  where?: Prisma.ClienteWhereInput
+}
+
+export type ClienteUpdateToOneWithWhereWithoutUsuarioInput = {
+  where?: Prisma.ClienteWhereInput
+  data: Prisma.XOR<Prisma.ClienteUpdateWithoutUsuarioInput, Prisma.ClienteUncheckedUpdateWithoutUsuarioInput>
+}
+
+export type ClienteUpdateWithoutUsuarioInput = {
+  nome?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  telefone?: Prisma.StringFieldUpdateOperationsInput | string
+  ativo?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pets?: Prisma.PetUpdateManyWithoutClienteNestedInput
+}
+
+export type ClienteUncheckedUpdateWithoutUsuarioInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  nome?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  telefone?: Prisma.StringFieldUpdateOperationsInput | string
+  ativo?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pets?: Prisma.PetUncheckedUpdateManyWithoutClienteNestedInput
 }
 
 
@@ -510,6 +600,7 @@ export type ClienteSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   createdAt?: boolean
   updatedAt?: boolean
   pets?: boolean | Prisma.Cliente$petsArgs<ExtArgs>
+  usuario?: boolean | Prisma.Cliente$usuarioArgs<ExtArgs>
   _count?: boolean | Prisma.ClienteCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["cliente"]>
 
@@ -546,6 +637,7 @@ export type ClienteSelectScalar = {
 export type ClienteOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nome" | "email" | "telefone" | "ativo" | "createdAt" | "updatedAt", ExtArgs["result"]["cliente"]>
 export type ClienteInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   pets?: boolean | Prisma.Cliente$petsArgs<ExtArgs>
+  usuario?: boolean | Prisma.Cliente$usuarioArgs<ExtArgs>
   _count?: boolean | Prisma.ClienteCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ClienteIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -555,6 +647,7 @@ export type $ClientePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
   name: "Cliente"
   objects: {
     pets: Prisma.$PetPayload<ExtArgs>[]
+    usuario: Prisma.$UsuarioPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -959,6 +1052,7 @@ readonly fields: ClienteFieldRefs;
 export interface Prisma__ClienteClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   pets<T extends Prisma.Cliente$petsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Cliente$petsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  usuario<T extends Prisma.Cliente$usuarioArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Cliente$usuarioArgs<ExtArgs>>): Prisma.Prisma__UsuarioClient<runtime.Types.Result.GetResult<Prisma.$UsuarioPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1409,6 +1503,25 @@ export type Cliente$petsArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
   take?: number
   skip?: number
   distinct?: Prisma.PetScalarFieldEnum | Prisma.PetScalarFieldEnum[]
+}
+
+/**
+ * Cliente.usuario
+ */
+export type Cliente$usuarioArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Usuario
+   */
+  select?: Prisma.UsuarioSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Usuario
+   */
+  omit?: Prisma.UsuarioOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UsuarioInclude<ExtArgs> | null
+  where?: Prisma.UsuarioWhereInput
 }
 
 /**

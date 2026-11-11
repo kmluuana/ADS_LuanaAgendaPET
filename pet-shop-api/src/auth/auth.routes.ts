@@ -2,7 +2,10 @@ import { Router } from "express";
 
 import { exigirAutenticacao } from "./auth.middleware";
 import { obterUsuarioPorId } from "./auth.repository";
-import { autenticarComGoogle } from "./auth.service";
+import {
+  autenticarComGoogle,
+  completarCadastroCliente,
+} from "./auth.service";
 import { gerarTokenUsuario } from "./token.service";
 
 const router = Router();
@@ -66,6 +69,38 @@ router.get("/me", exigirAutenticacao, async (_request, response) => {
     });
   }
 });
+
+router.post(
+  "/complete-profile",
+  exigirAutenticacao,
+  async (request, response) => {
+    try {
+      const { id } = response.locals.auth;
+      const { telefone } = request.body;
+
+      const cliente = await completarCadastroCliente(
+        id,
+        telefone,
+      );
+
+      response.status(200).json({
+        cliente,
+      });
+    } catch (error) {
+      if (error instanceof Error) {
+        response.status(400).json({
+          message: error.message,
+        });
+
+        return;
+      }
+
+      response.status(500).json({
+        message: "Erro interno ao completar cadastro",
+      });
+    }
+  },
+);
 
 router.post("/logout", (_request, response) => {
   response.clearCookie("agenda_pet_session", {

@@ -28,10 +28,12 @@ export type AggregateUsuario = {
 
 export type UsuarioAvgAggregateOutputType = {
   id: number | null
+  clienteId: number | null
 }
 
 export type UsuarioSumAggregateOutputType = {
   id: number | null
+  clienteId: number | null
 }
 
 export type UsuarioMinAggregateOutputType = {
@@ -41,6 +43,7 @@ export type UsuarioMinAggregateOutputType = {
   email: string | null
   perfil: $Enums.PerfilUsuario | null
   ativo: boolean | null
+  clienteId: number | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -52,6 +55,7 @@ export type UsuarioMaxAggregateOutputType = {
   email: string | null
   perfil: $Enums.PerfilUsuario | null
   ativo: boolean | null
+  clienteId: number | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -63,6 +67,7 @@ export type UsuarioCountAggregateOutputType = {
   email: number
   perfil: number
   ativo: number
+  clienteId: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -71,10 +76,12 @@ export type UsuarioCountAggregateOutputType = {
 
 export type UsuarioAvgAggregateInputType = {
   id?: true
+  clienteId?: true
 }
 
 export type UsuarioSumAggregateInputType = {
   id?: true
+  clienteId?: true
 }
 
 export type UsuarioMinAggregateInputType = {
@@ -84,6 +91,7 @@ export type UsuarioMinAggregateInputType = {
   email?: true
   perfil?: true
   ativo?: true
+  clienteId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -95,6 +103,7 @@ export type UsuarioMaxAggregateInputType = {
   email?: true
   perfil?: true
   ativo?: true
+  clienteId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -106,6 +115,7 @@ export type UsuarioCountAggregateInputType = {
   email?: true
   perfil?: true
   ativo?: true
+  clienteId?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -204,6 +214,7 @@ export type UsuarioGroupByOutputType = {
   email: string
   perfil: $Enums.PerfilUsuario
   ativo: boolean
+  clienteId: number | null
   createdAt: Date
   updatedAt: Date
   _count: UsuarioCountAggregateOutputType | null
@@ -238,8 +249,10 @@ export type UsuarioWhereInput = {
   email?: Prisma.StringFilter<"Usuario"> | string
   perfil?: Prisma.EnumPerfilUsuarioFilter<"Usuario"> | $Enums.PerfilUsuario
   ativo?: Prisma.BoolFilter<"Usuario"> | boolean
+  clienteId?: Prisma.IntNullableFilter<"Usuario"> | number | null
   createdAt?: Prisma.DateTimeFilter<"Usuario"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Usuario"> | Date | string
+  cliente?: Prisma.XOR<Prisma.ClienteNullableScalarRelationFilter, Prisma.ClienteWhereInput> | null
 }
 
 export type UsuarioOrderByWithRelationInput = {
@@ -249,14 +262,17 @@ export type UsuarioOrderByWithRelationInput = {
   email?: Prisma.SortOrder
   perfil?: Prisma.SortOrder
   ativo?: Prisma.SortOrder
+  clienteId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  cliente?: Prisma.ClienteOrderByWithRelationInput
 }
 
 export type UsuarioWhereUniqueInput = Prisma.AtLeast<{
   id?: number
   googleId?: string
   email?: string
+  clienteId?: number
   AND?: Prisma.UsuarioWhereInput | Prisma.UsuarioWhereInput[]
   OR?: Prisma.UsuarioWhereInput[]
   NOT?: Prisma.UsuarioWhereInput | Prisma.UsuarioWhereInput[]
@@ -265,7 +281,8 @@ export type UsuarioWhereUniqueInput = Prisma.AtLeast<{
   ativo?: Prisma.BoolFilter<"Usuario"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Usuario"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Usuario"> | Date | string
-}, "id" | "googleId" | "email">
+  cliente?: Prisma.XOR<Prisma.ClienteNullableScalarRelationFilter, Prisma.ClienteWhereInput> | null
+}, "id" | "googleId" | "email" | "clienteId">
 
 export type UsuarioOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -274,6 +291,7 @@ export type UsuarioOrderByWithAggregationInput = {
   email?: Prisma.SortOrder
   perfil?: Prisma.SortOrder
   ativo?: Prisma.SortOrder
+  clienteId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.UsuarioCountOrderByAggregateInput
@@ -293,6 +311,7 @@ export type UsuarioScalarWhereWithAggregatesInput = {
   email?: Prisma.StringWithAggregatesFilter<"Usuario"> | string
   perfil?: Prisma.EnumPerfilUsuarioWithAggregatesFilter<"Usuario"> | $Enums.PerfilUsuario
   ativo?: Prisma.BoolWithAggregatesFilter<"Usuario"> | boolean
+  clienteId?: Prisma.IntNullableWithAggregatesFilter<"Usuario"> | number | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Usuario"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Usuario"> | Date | string
 }
@@ -305,6 +324,7 @@ export type UsuarioCreateInput = {
   ativo?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  cliente?: Prisma.ClienteCreateNestedOneWithoutUsuarioInput
 }
 
 export type UsuarioUncheckedCreateInput = {
@@ -314,6 +334,7 @@ export type UsuarioUncheckedCreateInput = {
   email: string
   perfil?: $Enums.PerfilUsuario
   ativo?: boolean
+  clienteId?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -326,6 +347,7 @@ export type UsuarioUpdateInput = {
   ativo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  cliente?: Prisma.ClienteUpdateOneWithoutUsuarioNestedInput
 }
 
 export type UsuarioUncheckedUpdateInput = {
@@ -335,6 +357,7 @@ export type UsuarioUncheckedUpdateInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   perfil?: Prisma.EnumPerfilUsuarioFieldUpdateOperationsInput | $Enums.PerfilUsuario
   ativo?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clienteId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -346,6 +369,7 @@ export type UsuarioCreateManyInput = {
   email: string
   perfil?: $Enums.PerfilUsuario
   ativo?: boolean
+  clienteId?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -367,8 +391,14 @@ export type UsuarioUncheckedUpdateManyInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   perfil?: Prisma.EnumPerfilUsuarioFieldUpdateOperationsInput | $Enums.PerfilUsuario
   ativo?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clienteId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type UsuarioNullableScalarRelationFilter = {
+  is?: Prisma.UsuarioWhereInput | null
+  isNot?: Prisma.UsuarioWhereInput | null
 }
 
 export type UsuarioCountOrderByAggregateInput = {
@@ -378,12 +408,14 @@ export type UsuarioCountOrderByAggregateInput = {
   email?: Prisma.SortOrder
   perfil?: Prisma.SortOrder
   ativo?: Prisma.SortOrder
+  clienteId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
 export type UsuarioAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  clienteId?: Prisma.SortOrder
 }
 
 export type UsuarioMaxOrderByAggregateInput = {
@@ -393,6 +425,7 @@ export type UsuarioMaxOrderByAggregateInput = {
   email?: Prisma.SortOrder
   perfil?: Prisma.SortOrder
   ativo?: Prisma.SortOrder
+  clienteId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -404,16 +437,116 @@ export type UsuarioMinOrderByAggregateInput = {
   email?: Prisma.SortOrder
   perfil?: Prisma.SortOrder
   ativo?: Prisma.SortOrder
+  clienteId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
 export type UsuarioSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  clienteId?: Prisma.SortOrder
+}
+
+export type UsuarioCreateNestedOneWithoutClienteInput = {
+  create?: Prisma.XOR<Prisma.UsuarioCreateWithoutClienteInput, Prisma.UsuarioUncheckedCreateWithoutClienteInput>
+  connectOrCreate?: Prisma.UsuarioCreateOrConnectWithoutClienteInput
+  connect?: Prisma.UsuarioWhereUniqueInput
+}
+
+export type UsuarioUncheckedCreateNestedOneWithoutClienteInput = {
+  create?: Prisma.XOR<Prisma.UsuarioCreateWithoutClienteInput, Prisma.UsuarioUncheckedCreateWithoutClienteInput>
+  connectOrCreate?: Prisma.UsuarioCreateOrConnectWithoutClienteInput
+  connect?: Prisma.UsuarioWhereUniqueInput
+}
+
+export type UsuarioUpdateOneWithoutClienteNestedInput = {
+  create?: Prisma.XOR<Prisma.UsuarioCreateWithoutClienteInput, Prisma.UsuarioUncheckedCreateWithoutClienteInput>
+  connectOrCreate?: Prisma.UsuarioCreateOrConnectWithoutClienteInput
+  upsert?: Prisma.UsuarioUpsertWithoutClienteInput
+  disconnect?: Prisma.UsuarioWhereInput | boolean
+  delete?: Prisma.UsuarioWhereInput | boolean
+  connect?: Prisma.UsuarioWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UsuarioUpdateToOneWithWhereWithoutClienteInput, Prisma.UsuarioUpdateWithoutClienteInput>, Prisma.UsuarioUncheckedUpdateWithoutClienteInput>
+}
+
+export type UsuarioUncheckedUpdateOneWithoutClienteNestedInput = {
+  create?: Prisma.XOR<Prisma.UsuarioCreateWithoutClienteInput, Prisma.UsuarioUncheckedCreateWithoutClienteInput>
+  connectOrCreate?: Prisma.UsuarioCreateOrConnectWithoutClienteInput
+  upsert?: Prisma.UsuarioUpsertWithoutClienteInput
+  disconnect?: Prisma.UsuarioWhereInput | boolean
+  delete?: Prisma.UsuarioWhereInput | boolean
+  connect?: Prisma.UsuarioWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UsuarioUpdateToOneWithWhereWithoutClienteInput, Prisma.UsuarioUpdateWithoutClienteInput>, Prisma.UsuarioUncheckedUpdateWithoutClienteInput>
 }
 
 export type EnumPerfilUsuarioFieldUpdateOperationsInput = {
   set?: $Enums.PerfilUsuario
+}
+
+export type NullableIntFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
+export type UsuarioCreateWithoutClienteInput = {
+  googleId: string
+  nome: string
+  email: string
+  perfil?: $Enums.PerfilUsuario
+  ativo?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type UsuarioUncheckedCreateWithoutClienteInput = {
+  id?: number
+  googleId: string
+  nome: string
+  email: string
+  perfil?: $Enums.PerfilUsuario
+  ativo?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type UsuarioCreateOrConnectWithoutClienteInput = {
+  where: Prisma.UsuarioWhereUniqueInput
+  create: Prisma.XOR<Prisma.UsuarioCreateWithoutClienteInput, Prisma.UsuarioUncheckedCreateWithoutClienteInput>
+}
+
+export type UsuarioUpsertWithoutClienteInput = {
+  update: Prisma.XOR<Prisma.UsuarioUpdateWithoutClienteInput, Prisma.UsuarioUncheckedUpdateWithoutClienteInput>
+  create: Prisma.XOR<Prisma.UsuarioCreateWithoutClienteInput, Prisma.UsuarioUncheckedCreateWithoutClienteInput>
+  where?: Prisma.UsuarioWhereInput
+}
+
+export type UsuarioUpdateToOneWithWhereWithoutClienteInput = {
+  where?: Prisma.UsuarioWhereInput
+  data: Prisma.XOR<Prisma.UsuarioUpdateWithoutClienteInput, Prisma.UsuarioUncheckedUpdateWithoutClienteInput>
+}
+
+export type UsuarioUpdateWithoutClienteInput = {
+  googleId?: Prisma.StringFieldUpdateOperationsInput | string
+  nome?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  perfil?: Prisma.EnumPerfilUsuarioFieldUpdateOperationsInput | $Enums.PerfilUsuario
+  ativo?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type UsuarioUncheckedUpdateWithoutClienteInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  googleId?: Prisma.StringFieldUpdateOperationsInput | string
+  nome?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  perfil?: Prisma.EnumPerfilUsuarioFieldUpdateOperationsInput | $Enums.PerfilUsuario
+  ativo?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
@@ -425,8 +558,10 @@ export type UsuarioSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   email?: boolean
   perfil?: boolean
   ativo?: boolean
+  clienteId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  cliente?: boolean | Prisma.Usuario$clienteArgs<ExtArgs>
 }, ExtArgs["result"]["usuario"]>
 
 export type UsuarioSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -436,8 +571,10 @@ export type UsuarioSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   email?: boolean
   perfil?: boolean
   ativo?: boolean
+  clienteId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  cliente?: boolean | Prisma.Usuario$clienteArgs<ExtArgs>
 }, ExtArgs["result"]["usuario"]>
 
 export type UsuarioSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -447,8 +584,10 @@ export type UsuarioSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   email?: boolean
   perfil?: boolean
   ativo?: boolean
+  clienteId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  cliente?: boolean | Prisma.Usuario$clienteArgs<ExtArgs>
 }, ExtArgs["result"]["usuario"]>
 
 export type UsuarioSelectScalar = {
@@ -458,15 +597,27 @@ export type UsuarioSelectScalar = {
   email?: boolean
   perfil?: boolean
   ativo?: boolean
+  clienteId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type UsuarioOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "googleId" | "nome" | "email" | "perfil" | "ativo" | "createdAt" | "updatedAt", ExtArgs["result"]["usuario"]>
+export type UsuarioOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "googleId" | "nome" | "email" | "perfil" | "ativo" | "clienteId" | "createdAt" | "updatedAt", ExtArgs["result"]["usuario"]>
+export type UsuarioInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  cliente?: boolean | Prisma.Usuario$clienteArgs<ExtArgs>
+}
+export type UsuarioIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  cliente?: boolean | Prisma.Usuario$clienteArgs<ExtArgs>
+}
+export type UsuarioIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  cliente?: boolean | Prisma.Usuario$clienteArgs<ExtArgs>
+}
 
 export type $UsuarioPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Usuario"
-  objects: {}
+  objects: {
+    cliente: Prisma.$ClientePayload<ExtArgs> | null
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     googleId: string
@@ -474,6 +625,7 @@ export type $UsuarioPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     email: string
     perfil: $Enums.PerfilUsuario
     ativo: boolean
+    clienteId: number | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["usuario"]>
@@ -870,6 +1022,7 @@ readonly fields: UsuarioFieldRefs;
  */
 export interface Prisma__UsuarioClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  cliente<T extends Prisma.Usuario$clienteArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Usuario$clienteArgs<ExtArgs>>): Prisma.Prisma__ClienteClient<runtime.Types.Result.GetResult<Prisma.$ClientePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -905,6 +1058,7 @@ export interface UsuarioFieldRefs {
   readonly email: Prisma.FieldRef<"Usuario", 'String'>
   readonly perfil: Prisma.FieldRef<"Usuario", 'PerfilUsuario'>
   readonly ativo: Prisma.FieldRef<"Usuario", 'Boolean'>
+  readonly clienteId: Prisma.FieldRef<"Usuario", 'Int'>
   readonly createdAt: Prisma.FieldRef<"Usuario", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Usuario", 'DateTime'>
 }
@@ -924,6 +1078,10 @@ export type UsuarioFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Inter
    */
   omit?: Prisma.UsuarioOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UsuarioInclude<ExtArgs> | null
+  /**
    * Filter, which Usuario to fetch.
    */
   where: Prisma.UsuarioWhereUniqueInput
@@ -942,6 +1100,10 @@ export type UsuarioFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extension
    */
   omit?: Prisma.UsuarioOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UsuarioInclude<ExtArgs> | null
+  /**
    * Filter, which Usuario to fetch.
    */
   where: Prisma.UsuarioWhereUniqueInput
@@ -959,6 +1121,10 @@ export type UsuarioFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Omit specific fields from the Usuario
    */
   omit?: Prisma.UsuarioOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UsuarioInclude<ExtArgs> | null
   /**
    * Filter, which Usuario to fetch.
    */
@@ -1008,6 +1174,10 @@ export type UsuarioFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions
    */
   omit?: Prisma.UsuarioOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UsuarioInclude<ExtArgs> | null
+  /**
    * Filter, which Usuario to fetch.
    */
   where?: Prisma.UsuarioWhereInput
@@ -1055,6 +1225,10 @@ export type UsuarioFindManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Omit specific fields from the Usuario
    */
   omit?: Prisma.UsuarioOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UsuarioInclude<ExtArgs> | null
   /**
    * Filter, which Usuarios to fetch.
    */
@@ -1104,6 +1278,10 @@ export type UsuarioCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    */
   omit?: Prisma.UsuarioOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UsuarioInclude<ExtArgs> | null
+  /**
    * The data needed to create a Usuario.
    */
   data: Prisma.XOR<Prisma.UsuarioCreateInput, Prisma.UsuarioUncheckedCreateInput>
@@ -1137,6 +1315,10 @@ export type UsuarioCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensi
    */
   data: Prisma.UsuarioCreateManyInput | Prisma.UsuarioCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UsuarioIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1151,6 +1333,10 @@ export type UsuarioUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Omit specific fields from the Usuario
    */
   omit?: Prisma.UsuarioOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UsuarioInclude<ExtArgs> | null
   /**
    * The data needed to update a Usuario.
    */
@@ -1203,6 +1389,10 @@ export type UsuarioUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensi
    * Limit how many Usuarios to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UsuarioIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1217,6 +1407,10 @@ export type UsuarioUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Omit specific fields from the Usuario
    */
   omit?: Prisma.UsuarioOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UsuarioInclude<ExtArgs> | null
   /**
    * The filter to search for the Usuario to update in case it exists.
    */
@@ -1244,6 +1438,10 @@ export type UsuarioDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    */
   omit?: Prisma.UsuarioOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UsuarioInclude<ExtArgs> | null
+  /**
    * Filter which Usuario to delete.
    */
   where: Prisma.UsuarioWhereUniqueInput
@@ -1264,6 +1462,25 @@ export type UsuarioDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
 }
 
 /**
+ * Usuario.cliente
+ */
+export type Usuario$clienteArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Cliente
+   */
+  select?: Prisma.ClienteSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Cliente
+   */
+  omit?: Prisma.ClienteOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ClienteInclude<ExtArgs> | null
+  where?: Prisma.ClienteWhereInput
+}
+
+/**
  * Usuario without action
  */
 export type UsuarioDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1275,4 +1492,8 @@ export type UsuarioDefaultArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Omit specific fields from the Usuario
    */
   omit?: Prisma.UsuarioOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UsuarioInclude<ExtArgs> | null
 }

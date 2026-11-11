@@ -162,6 +162,7 @@ export const UsuarioScalarFieldEnum = {
   email: 'email',
   perfil: 'perfil',
   ativo: 'ativo',
+  clienteId: 'clienteId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

@@ -15,6 +15,12 @@ enum StatusAgendamento {
   CANCELADO
 }
 
+enum PerfilUsuario {
+  CLIENTE
+  ATENDENTE
+  ADMINISTRADOR
+}
+
 model Servico {
   id        Int      @id @default(autoincrement())
   nome      String
@@ -38,7 +44,8 @@ model Cliente {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  pets Pet[]
+  pets    Pet[]
+  usuario Usuario?
 }
 
 model Pet {
@@ -100,12 +107,6 @@ model Agendamento {
   updatedAt DateTime @updatedAt
 }
 
-enum PerfilUsuario {
-  CLIENTE
-  ATENDENTE
-  ADMINISTRADOR
-}
-
 model Usuario {
   id       Int           @id @default(autoincrement())
   googleId String        @unique
@@ -113,6 +114,9 @@ model Usuario {
   email    String        @unique
   perfil   PerfilUsuario @default(CLIENTE)
   ativo    Boolean       @default(true)
+
+  clienteId Int?     @unique
+  cliente   Cliente? @relation(fields: [clienteId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

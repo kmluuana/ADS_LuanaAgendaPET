@@ -21,6 +21,7 @@ export async function obterUsuarioPorId(id: number) {
       email: true,
       perfil: true,
       ativo: true,
+      clienteId: true,
     },
   });
 }
@@ -61,7 +62,9 @@ export async function atualizarPerfilUsuario(
 ) {
   return db.usuario.update({
     where: { id },
-    data: { perfil },
+    data: {
+      perfil,
+    },
   });
 }
 
@@ -71,6 +74,80 @@ export async function atualizarStatusUsuario(
 ) {
   return db.usuario.update({
     where: { id },
-    data: { ativo },
+    data: {
+      ativo,
+    },
+  });
+}
+
+export async function criarOuVincularClienteAoUsuario(
+  usuarioId: number,
+  telefone: string,
+) {
+  return db.$transaction(async (tx) => {
+    const usuario = await tx.usuario.findUnique({
+      where: {
+        id: usuarioId,
+      },
+    });
+
+    if (!usuario) {
+      throw new Error("Usuário não encontrado");
+    }
+
+    if (usuario.clienteId) {
+      return tx.cliente.findUnique({
+        where: {
+          id: usuario.clienteId,
+        },
+      });
+    }
+
+    const clienteExistente = await tx.cliente.findUnique({
+      where: {
+        email: usuario.email,
+      },
+      include: {
+        usuario: true,
+      },
+    });
+
+    if (clienteExistente) {
+      if (clienteExistente.usuario) {
+        throw new Error(
+          "Cliente já vinculado a outro usuário",
+        );
+      }
+
+      await tx.usuario.update({
+        where: {
+          id: usuario.id,
+        },
+        data: {
+          clienteId: clienteExistente.id,
+        },
+      });
+
+      return clienteExistente;
+    }
+
+    const cliente = await tx.cliente.create({
+      data: {
+        nome: usuario.nome,
+        email: usuario.email,
+        telefone,
+      },
+    });
+
+    await tx.usuario.update({
+      where: {
+        id: usuario.id,
+      },
+      data: {
+        clienteId: cliente.id,
+      },
+    });
+
+    return cliente;
   });
 }

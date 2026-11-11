@@ -6,12 +6,33 @@ import {
   Routes,
 } from "react-router";
 
+import CompleteProfilePage from "./pages/CompleteProfilePage";
 import DashboardPage from "./pages/DashboardPage";
+import EditPetPage from "./pages/EditPetPage";
 import LoginPage from "./pages/LoginPage";
+import NewPetPage from "./pages/NewPetPage";
+import PetsPage from "./pages/PetsPage";
 
-function ProtectedRoute({ children }: { children: ReactNode }) {
+type Usuario = {
+  id: number;
+  nome: string;
+  email: string;
+  perfil: "CLIENTE" | "ATENDENTE" | "ADMINISTRADOR";
+  ativo: boolean;
+  clienteId: number | null;
+};
+
+type ProtectedRouteProps = {
+  children: ReactNode;
+  exigirCliente?: boolean;
+};
+
+function ProtectedRoute({
+  children,
+  exigirCliente = true,
+}: ProtectedRouteProps) {
   const [carregando, setCarregando] = useState(true);
-  const [autenticado, setAutenticado] = useState(false);
+  const [usuario, setUsuario] = useState<Usuario | null>(null);
 
   useEffect(() => {
     async function verificarSessao() {
@@ -20,9 +41,16 @@ function ProtectedRoute({ children }: { children: ReactNode }) {
           credentials: "include",
         });
 
-        setAutenticado(response.ok);
+        if (!response.ok) {
+          setUsuario(null);
+          return;
+        }
+
+        const data = await response.json();
+
+        setUsuario(data.usuario);
       } catch {
-        setAutenticado(false);
+        setUsuario(null);
       } finally {
         setCarregando(false);
       }
@@ -35,8 +63,16 @@ function ProtectedRoute({ children }: { children: ReactNode }) {
     return <p>Carregando...</p>;
   }
 
-  if (!autenticado) {
+  if (!usuario) {
     return <Navigate to="/login" replace />;
+  }
+
+  if (exigirCliente && usuario.clienteId === null) {
+    return <Navigate to="/complete-profile" replace />;
+  }
+
+  if (!exigirCliente && usuario.clienteId !== null) {
+    return <Navigate to="/dashboard" replace />;
   }
 
   return children;
@@ -57,10 +93,46 @@ function App() {
         />
 
         <Route
+          path="/complete-profile"
+          element={
+            <ProtectedRoute exigirCliente={false}>
+              <CompleteProfilePage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
           path="/dashboard"
           element={
             <ProtectedRoute>
               <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/pets"
+          element={
+            <ProtectedRoute>
+              <PetsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/pets/novo"
+          element={
+            <ProtectedRoute>
+              <NewPetPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/pets/:id/editar"
+          element={
+            <ProtectedRoute>
+              <EditPetPage />
             </ProtectedRoute>
           }
         />

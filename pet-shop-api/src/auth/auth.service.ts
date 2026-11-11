@@ -2,6 +2,7 @@ import { OAuth2Client } from "google-auth-library";
 
 import {
   atualizarDadosGoogle,
+  criarOuVincularClienteAoUsuario,
   criarUsuario,
   obterUsuarioPorGoogleId,
 } from "./auth.repository";
@@ -58,4 +59,18 @@ export async function autenticarComGoogle(idToken: string) {
   }
 
   return usuario;
+}
+
+export async function completarCadastroCliente(
+  usuarioId: number,
+  telefone: string,
+) {
+  if (!telefone || telefone.trim() === "") {
+    throw new Error("Telefone é obrigatório");
+  }
+
+  return criarOuVincularClienteAoUsuario(
+    usuarioId,
+    telefone.trim(),
+  );
 }
