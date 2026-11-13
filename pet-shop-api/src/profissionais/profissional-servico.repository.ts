@@ -25,6 +25,19 @@ export async function listarServicosDoProfissional(
   });
 }
 
+export async function listarProfissionaisDoServico(
+  servicoId: number,
+) {
+  return db.profissionalServico.findMany({
+    where: {
+      servicoId,
+    },
+    include: {
+      profissional: true,
+    },
+  });
+}
+
 export async function removerServicoDoProfissional(
   profissionalId: number,
   servicoId: number,

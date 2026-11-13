@@ -13,6 +13,26 @@ export async function listarAgendamentos() {
   });
 }
 
+export async function listarAgendamentosPorCliente(
+  clienteId: number,
+) {
+  return db.agendamento.findMany({
+    where: {
+      pet: {
+        clienteId,
+      },
+    },
+    include: {
+      pet: true,
+      servico: true,
+      profissional: true,
+    },
+    orderBy: {
+      dataHora: "asc",
+    },
+  });
+}
+
 export async function obterAgendamentoPorId(id: number) {
   return db.agendamento.findUnique({
     where: {

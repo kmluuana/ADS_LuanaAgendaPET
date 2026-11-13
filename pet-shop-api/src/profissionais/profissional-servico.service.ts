@@ -1,37 +1,88 @@
+import { obterServicoPorId } from "../servicos/servico.repository";
+
+import {
+  obterProfissionalPorId,
+} from "./profissional.repository";
+
 import {
   adicionarServicoAoProfissional,
+  listarProfissionaisDoServico,
   listarServicosDoProfissional,
   obterRelacaoProfissionalServico,
   removerServicoDoProfissional,
 } from "./profissional-servico.repository";
 
-import { obterProfissionalPorId } from "./profissional.repository";
-import { obterServicoPorId } from "../servicos/servico.repository";
+function validarId(
+  id: number,
+  nome: string,
+) {
+  if (
+    !Number.isInteger(id) ||
+    id <= 0
+  ) {
+    throw new Error(
+      `${nome} inválido`,
+    );
+  }
+}
 
 export async function vincularServicoAoProfissional(
   profissionalId: number,
   servicoId: number,
 ) {
-  const profissional = await obterProfissionalPorId(profissionalId);
+  validarId(
+    profissionalId,
+    "Profissional",
+  );
+
+  validarId(
+    servicoId,
+    "Serviço",
+  );
+
+  const profissional =
+    await obterProfissionalPorId(
+      profissionalId,
+    );
 
   if (!profissional) {
-    throw new Error("Profissional não encontrado");
+    throw new Error(
+      "Profissional não encontrado",
+    );
   }
 
-  const servico = await obterServicoPorId(servicoId);
+  if (!profissional.ativo) {
+    throw new Error(
+      "Profissional está inativo",
+    );
+  }
+
+  const servico =
+    await obterServicoPorId(
+      servicoId,
+    );
 
   if (!servico) {
-    throw new Error("Serviço não encontrado");
+    throw new Error(
+      "Serviço não encontrado",
+    );
   }
 
-  const relacaoExistente = await obterRelacaoProfissionalServico(
-    profissionalId,
-    servicoId,
-  );
+  if (!servico.ativo) {
+    throw new Error(
+      "Serviço está inativo",
+    );
+  }
+
+  const relacaoExistente =
+    await obterRelacaoProfissionalServico(
+      profissionalId,
+      servicoId,
+    );
 
   if (relacaoExistente) {
     throw new Error(
-      "Este serviço já está vinculado ao profissional",
+      "Profissional já está vinculado ao serviço",
     );
   }
 
@@ -44,26 +95,110 @@ export async function vincularServicoAoProfissional(
 export async function buscarServicosDoProfissional(
   profissionalId: number,
 ) {
-  const profissional = await obterProfissionalPorId(profissionalId);
+  validarId(
+    profissionalId,
+    "Profissional",
+  );
+
+  const profissional =
+    await obterProfissionalPorId(
+      profissionalId,
+    );
 
   if (!profissional) {
-    return null;
+    throw new Error(
+      "Profissional não encontrado",
+    );
   }
 
-  return listarServicosDoProfissional(profissionalId);
+  const relacoes =
+    await listarServicosDoProfissional(
+      profissionalId,
+    );
+
+  return relacoes
+    .map(
+      (relacao) =>
+        relacao.servico,
+    )
+    .filter(
+      (servico) =>
+        servico.ativo,
+    );
+}
+
+export async function buscarProfissionaisDoServico(
+  servicoId: number,
+) {
+  validarId(
+    servicoId,
+    "Serviço",
+  );
+
+  const servico =
+    await obterServicoPorId(
+      servicoId,
+    );
+
+  if (!servico) {
+    throw new Error(
+      "Serviço não encontrado",
+    );
+  }
+
+  if (!servico.ativo) {
+    throw new Error(
+      "Serviço está inativo",
+    );
+  }
+
+  const relacoes =
+    await listarProfissionaisDoServico(
+      servicoId,
+    );
+
+  return relacoes
+    .map(
+      (relacao) =>
+        relacao.profissional,
+    )
+    .filter(
+      (profissional) =>
+        profissional.ativo,
+    )
+    .sort(
+      (a, b) =>
+        a.nome.localeCompare(
+          b.nome,
+          "pt-BR",
+        ),
+    );
 }
 
 export async function desvincularServicoDoProfissional(
   profissionalId: number,
   servicoId: number,
 ) {
-  const relacao = await obterRelacaoProfissionalServico(
+  validarId(
     profissionalId,
-    servicoId,
+    "Profissional",
   );
 
+  validarId(
+    servicoId,
+    "Serviço",
+  );
+
+  const relacao =
+    await obterRelacaoProfissionalServico(
+      profissionalId,
+      servicoId,
+    );
+
   if (!relacao) {
-    return null;
+    throw new Error(
+      "Vínculo entre profissional e serviço não encontrado",
+    );
   }
 
   return removerServicoDoProfissional(

@@ -1,163 +1,191 @@
 import { Router } from "express";
 
 import {
-  alterarStatusProfissional,
-  buscarProfissionalPorId,
-  buscarProfissionais,
-  cadastrarProfissional,
-  editarProfissional,
-} from "./profissional.service";
+  buscarProfissionaisDoServico,
+  buscarServicosDoProfissional,
+  desvincularServicoDoProfissional,
+  vincularServicoAoProfissional,
+} from "./profissional-servico.service";
 
 const router = Router();
 
-router.get("/", async (_request, response, next) => {
-  try {
-    const profissionais = await buscarProfissionais();
+router.get(
+  "/por-servico/:servicoId",
+  async (
+    request,
+    response,
+  ) => {
+    try {
+      const servicoId =
+        Number(
+          request.params.servicoId,
+        );
 
-    response.json(profissionais);
-  } catch (error) {
-    next(error);
-  }
-});
+      const profissionais =
+        await buscarProfissionaisDoServico(
+          servicoId,
+        );
 
-router.get("/:id", async (request, response, next) => {
-  try {
-    const id = Number(request.params.id);
+      response.json(
+        profissionais,
+      );
+    } catch (error) {
+      if (error instanceof Error) {
+        response
+          .status(400)
+          .json({
+            message:
+              error.message,
+          });
 
-    if (!Number.isInteger(id) || id <= 0) {
-      response.status(400).json({
-        message: "Id inválido",
-      });
+        return;
+      }
 
-      return;
+      response
+        .status(500)
+        .json({
+          message:
+            "Erro interno ao consultar profissionais do serviço",
+        });
     }
+  },
+);
 
-    const profissional = await buscarProfissionalPorId(id);
+router.get(
+  "/:id/servicos",
+  async (
+    request,
+    response,
+  ) => {
+    try {
+      const profissionalId =
+        Number(
+          request.params.id,
+        );
 
-    if (!profissional) {
-      response.status(404).json({
-        message: "Profissional não encontrado",
-      });
+      const servicos =
+        await buscarServicosDoProfissional(
+          profissionalId,
+        );
 
-      return;
+      response.json(
+        servicos,
+      );
+    } catch (error) {
+      if (error instanceof Error) {
+        response
+          .status(400)
+          .json({
+            message:
+              error.message,
+          });
+
+        return;
+      }
+
+      response
+        .status(500)
+        .json({
+          message:
+            "Erro interno ao consultar serviços do profissional",
+        });
     }
+  },
+);
 
-    response.json(profissional);
-  } catch (error) {
-    next(error);
-  }
-});
+router.post(
+  "/:id/servicos/:servicoId",
+  async (
+    request,
+    response,
+  ) => {
+    try {
+      const profissionalId =
+        Number(
+          request.params.id,
+        );
 
-router.post("/", async (request, response, next) => {
-  try {
-    const { nome, email, telefone } = request.body;
+      const servicoId =
+        Number(
+          request.params.servicoId,
+        );
 
-    const profissional = await cadastrarProfissional({
-      nome,
-      email,
-      telefone,
-    });
+      const vinculo =
+        await vincularServicoAoProfissional(
+          profissionalId,
+          servicoId,
+        );
 
-    if (!profissional) {
-      response.status(409).json({
-        message: "Já existe um profissional com este e-mail",
-      });
+      response
+        .status(201)
+        .json(vinculo);
+    } catch (error) {
+      if (error instanceof Error) {
+        response
+          .status(400)
+          .json({
+            message:
+              error.message,
+          });
 
-      return;
+        return;
+      }
+
+      response
+        .status(500)
+        .json({
+          message:
+            "Erro interno ao vincular serviço ao profissional",
+        });
     }
+  },
+);
 
-    response.status(201).json(profissional);
-  } catch (error) {
-    if (error instanceof Error) {
-      response.status(400).json({
-        message: error.message,
-      });
+router.delete(
+  "/:id/servicos/:servicoId",
+  async (
+    request,
+    response,
+  ) => {
+    try {
+      const profissionalId =
+        Number(
+          request.params.id,
+        );
 
-      return;
+      const servicoId =
+        Number(
+          request.params.servicoId,
+        );
+
+      await desvincularServicoDoProfissional(
+        profissionalId,
+        servicoId,
+      );
+
+      response
+        .status(204)
+        .send();
+    } catch (error) {
+      if (error instanceof Error) {
+        response
+          .status(400)
+          .json({
+            message:
+              error.message,
+          });
+
+        return;
+      }
+
+      response
+        .status(500)
+        .json({
+          message:
+            "Erro interno ao desvincular serviço do profissional",
+        });
     }
-
-    next(error);
-  }
-});
-
-router.put("/:id", async (request, response, next) => {
-  try {
-    const id = Number(request.params.id);
-
-    if (!Number.isInteger(id) || id <= 0) {
-      response.status(400).json({
-        message: "Id inválido",
-      });
-
-      return;
-    }
-
-    const { nome, email, telefone } = request.body;
-
-    const profissional = await editarProfissional(id, {
-      nome,
-      email,
-      telefone,
-    });
-
-    if (!profissional) {
-      response.status(404).json({
-        message: "Profissional não encontrado",
-      });
-
-      return;
-    }
-
-    response.json(profissional);
-  } catch (error) {
-    if (error instanceof Error) {
-      response.status(400).json({
-        message: error.message,
-      });
-
-      return;
-    }
-
-    next(error);
-  }
-});
-
-router.patch("/:id/ativo", async (request, response, next) => {
-  try {
-    const id = Number(request.params.id);
-
-    if (!Number.isInteger(id) || id <= 0) {
-      response.status(400).json({
-        message: "Id inválido",
-      });
-
-      return;
-    }
-
-    const { ativo } = request.body;
-
-    if (typeof ativo !== "boolean") {
-      response.status(400).json({
-        message: "O campo ativo deve ser true ou false",
-      });
-
-      return;
-    }
-
-    const profissional = await alterarStatusProfissional(id, ativo);
-
-    if (!profissional) {
-      response.status(404).json({
-        message: "Profissional não encontrado",
-      });
-
-      return;
-    }
-
-    response.json(profissional);
-  } catch (error) {
-    next(error);
-  }
-});
+  },
+);
 
 export default router;

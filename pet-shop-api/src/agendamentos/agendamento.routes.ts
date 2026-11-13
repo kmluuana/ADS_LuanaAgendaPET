@@ -1,55 +1,78 @@
 import { Router } from "express";
 
+import { exigirAutenticacao } from "../auth/auth.middleware";
+
 import {
-  alterarStatusDoAgendamento,
-  buscarAgendamentoPorId,
-  buscarAgendamentos,
-  cadastrarAgendamento,
-  editarAgendamento,
+  alterarStatusDoAgendamentoDoUsuario,
+  buscarAgendamentoDoUsuario,
+  cadastrarAgendamentoDoUsuario,
+  editarAgendamentoDoUsuario,
+  listarAgendamentosDoUsuario,
 } from "./agendamento.service";
 
 const router = Router();
 
-router.get("/", async (_request, response, next) => {
+router.get("/", exigirAutenticacao, async (_request, response) => {
   try {
-    const agendamentos = await buscarAgendamentos();
+    const { id, perfil } = response.locals.auth;
+
+    const agendamentos = await listarAgendamentosDoUsuario(
+      id,
+      perfil,
+    );
 
     response.json(agendamentos);
   } catch (error) {
-    next(error);
+    if (error instanceof Error) {
+      response.status(400).json({
+        message: error.message,
+      });
+
+      return;
+    }
+
+    response.status(500).json({
+      message: "Erro interno ao listar agendamentos",
+    });
   }
 });
 
-router.get("/:id", async (request, response, next) => {
+router.get("/:id", exigirAutenticacao, async (request, response) => {
   try {
-    const id = Number(request.params.id);
+    const agendamentoId = Number(request.params.id);
+    const { id: usuarioId, perfil } = response.locals.auth;
 
-    if (!Number.isInteger(id) || id <= 0) {
-      response.status(400).json({
-        message: "Id inválido",
-      });
-
-      return;
-    }
-
-    const agendamento = await buscarAgendamentoPorId(id);
-
-    if (!agendamento) {
-      response.status(404).json({
-        message: "Agendamento não encontrado",
-      });
-
-      return;
-    }
+    const agendamento = await buscarAgendamentoDoUsuario(
+      agendamentoId,
+      usuarioId,
+      perfil,
+    );
 
     response.json(agendamento);
   } catch (error) {
-    next(error);
+    if (error instanceof Error) {
+      const status =
+        error.message === "Agendamento não encontrado"
+          ? 404
+          : 400;
+
+      response.status(status).json({
+        message: error.message,
+      });
+
+      return;
+    }
+
+    response.status(500).json({
+      message: "Erro interno ao consultar agendamento",
+    });
   }
 });
 
-router.post("/", async (request, response, next) => {
+router.post("/", exigirAutenticacao, async (request, response) => {
   try {
+    const { id: usuarioId, perfil } = response.locals.auth;
+
     const {
       dataHora,
       observacoes,
@@ -58,13 +81,17 @@ router.post("/", async (request, response, next) => {
       profissionalId,
     } = request.body;
 
-    const agendamento = await cadastrarAgendamento({
-      dataHora: new Date(dataHora),
-      observacoes,
-      petId,
-      servicoId,
-      profissionalId,
-    });
+    const agendamento = await cadastrarAgendamentoDoUsuario(
+      usuarioId,
+      perfil,
+      {
+        dataHora: new Date(dataHora),
+        observacoes,
+        petId: Number(petId),
+        servicoId: Number(servicoId),
+        profissionalId: Number(profissionalId),
+      },
+    );
 
     response.status(201).json(agendamento);
   } catch (error) {
@@ -76,21 +103,16 @@ router.post("/", async (request, response, next) => {
       return;
     }
 
-    next(error);
+    response.status(500).json({
+      message: "Erro interno ao cadastrar agendamento",
+    });
   }
 });
 
-router.put("/:id", async (request, response, next) => {
+router.put("/:id", exigirAutenticacao, async (request, response) => {
   try {
-    const id = Number(request.params.id);
-
-    if (!Number.isInteger(id) || id <= 0) {
-      response.status(400).json({
-        message: "Id inválido",
-      });
-
-      return;
-    }
+    const agendamentoId = Number(request.params.id);
+    const { id: usuarioId, perfil } = response.locals.auth;
 
     const {
       dataHora,
@@ -100,79 +122,77 @@ router.put("/:id", async (request, response, next) => {
       profissionalId,
     } = request.body;
 
-    const agendamento = await editarAgendamento(id, {
-      dataHora: new Date(dataHora),
-      observacoes,
-      petId,
-      servicoId,
-      profissionalId,
-    });
-
-    if (!agendamento) {
-      response.status(404).json({
-        message: "Agendamento não encontrado",
-      });
-
-      return;
-    }
+    const agendamento = await editarAgendamentoDoUsuario(
+      agendamentoId,
+      usuarioId,
+      perfil,
+      {
+        dataHora: new Date(dataHora),
+        observacoes,
+        petId: Number(petId),
+        servicoId: Number(servicoId),
+        profissionalId: Number(profissionalId),
+      },
+    );
 
     response.json(agendamento);
   } catch (error) {
     if (error instanceof Error) {
-      response.status(400).json({
+      const status =
+        error.message === "Agendamento não encontrado"
+          ? 404
+          : 400;
+
+      response.status(status).json({
         message: error.message,
       });
 
       return;
     }
 
-    next(error);
+    response.status(500).json({
+      message: "Erro interno ao atualizar agendamento",
+    });
   }
 });
 
-router.patch("/:id/status", async (request, response, next) => {
-  try {
-    const id = Number(request.params.id);
+router.patch(
+  "/:id/status",
+  exigirAutenticacao,
+  async (request, response) => {
+    try {
+      const agendamentoId = Number(request.params.id);
+      const { id: usuarioId, perfil } = response.locals.auth;
+      const { status } = request.body;
 
-    if (!Number.isInteger(id) || id <= 0) {
-      response.status(400).json({
-        message: "Id inválido",
+      const agendamento =
+        await alterarStatusDoAgendamentoDoUsuario(
+          agendamentoId,
+          usuarioId,
+          perfil,
+          status,
+        );
+
+      response.json(agendamento);
+    } catch (error) {
+      if (error instanceof Error) {
+        const statusCode =
+          error.message === "Agendamento não encontrado"
+            ? 404
+            : 400;
+
+        response.status(statusCode).json({
+          message: error.message,
+        });
+
+        return;
+      }
+
+      response.status(500).json({
+        message: "Erro interno ao alterar status do agendamento",
       });
-
-      return;
     }
-
-    const { status } = request.body;
-
-    if (
-      status !== "AGENDADO" &&
-      status !== "CONCLUIDO" &&
-      status !== "CANCELADO"
-    ) {
-      response.status(400).json({
-        message: "Status inválido",
-      });
-
-      return;
-    }
-
-    const agendamento = await alterarStatusDoAgendamento(
-      id,
-      status,
-    );
-
-    if (!agendamento) {
-      response.status(404).json({
-        message: "Agendamento não encontrado",
-      });
-
-      return;
-    }
-
-    response.json(agendamento);
-  } catch (error) {
-    next(error);
-  }
-});
+  },
+);
 
 export default router;

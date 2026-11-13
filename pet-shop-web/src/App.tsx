@@ -6,10 +6,12 @@ import {
   Routes,
 } from "react-router";
 
+import AppointmentsPage from "./pages/AppointmentsPage";
 import CompleteProfilePage from "./pages/CompleteProfilePage";
 import DashboardPage from "./pages/DashboardPage";
 import EditPetPage from "./pages/EditPetPage";
 import LoginPage from "./pages/LoginPage";
+import NewAppointmentPage from "./pages/NewAppointmentPage";
 import NewPetPage from "./pages/NewPetPage";
 import PetsPage from "./pages/PetsPage";
 
@@ -37,9 +39,12 @@ function ProtectedRoute({
   useEffect(() => {
     async function verificarSessao() {
       try {
-        const response = await fetch("/api/auth/me", {
-          credentials: "include",
-        });
+        const response = await fetch(
+          "/api/auth/me",
+          {
+            credentials: "include",
+          },
+        );
 
         if (!response.ok) {
           setUsuario(null);
@@ -64,15 +69,36 @@ function ProtectedRoute({
   }
 
   if (!usuario) {
-    return <Navigate to="/login" replace />;
+    return (
+      <Navigate
+        to="/login"
+        replace
+      />
+    );
   }
 
-  if (exigirCliente && usuario.clienteId === null) {
-    return <Navigate to="/complete-profile" replace />;
+  if (
+    exigirCliente &&
+    usuario.clienteId === null
+  ) {
+    return (
+      <Navigate
+        to="/complete-profile"
+        replace
+      />
+    );
   }
 
-  if (!exigirCliente && usuario.clienteId !== null) {
-    return <Navigate to="/dashboard" replace />;
+  if (
+    !exigirCliente &&
+    usuario.clienteId !== null
+  ) {
+    return (
+      <Navigate
+        to="/dashboard"
+        replace
+      />
+    );
   }
 
   return children;
@@ -84,7 +110,12 @@ function App() {
       <Routes>
         <Route
           path="/"
-          element={<Navigate to="/dashboard" replace />}
+          element={
+            <Navigate
+              to="/dashboard"
+              replace
+            />
+          }
         />
 
         <Route
@@ -95,7 +126,9 @@ function App() {
         <Route
           path="/complete-profile"
           element={
-            <ProtectedRoute exigirCliente={false}>
+            <ProtectedRoute
+              exigirCliente={false}
+            >
               <CompleteProfilePage />
             </ProtectedRoute>
           }
@@ -138,8 +171,31 @@ function App() {
         />
 
         <Route
+          path="/agendamentos"
+          element={
+            <ProtectedRoute>
+              <AppointmentsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/agendamentos/novo"
+          element={
+            <ProtectedRoute>
+              <NewAppointmentPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
           path="*"
-          element={<Navigate to="/dashboard" replace />}
+          element={
+            <Navigate
+              to="/dashboard"
+              replace
+            />
+          }
         />
       </Routes>
     </BrowserRouter>
