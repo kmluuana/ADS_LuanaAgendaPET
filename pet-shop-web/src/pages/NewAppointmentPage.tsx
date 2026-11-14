@@ -2,10 +2,15 @@ import {
   useEffect,
   useMemo,
   useState,
-  type FormEvent,
 } from "react";
+
+import type {
+  FormEvent,
+} from "react";
+
 import {
   Link,
+  NavLink,
   useNavigate,
 } from "react-router";
 
@@ -15,12 +20,16 @@ import "./AppointmentFormPage.css";
 type Pet = {
   id: number;
   nome: string;
+  especie: string;
+  raca?: string | null;
   ativo: boolean;
 };
 
 type Servico = {
   id: number;
   nome: string;
+  descricao?: string | null;
+  preco: string;
   duracao: number;
   ativo: boolean;
 };
@@ -28,7 +37,13 @@ type Servico = {
 type Profissional = {
   id: number;
   nome: string;
+  email: string;
+  telefone: string;
   ativo: boolean;
+};
+
+type ApiError = {
+  message?: string;
 };
 
 function formatarDataHoraLocal(
@@ -47,13 +62,8 @@ function formatarDataHoraLocal(
 }
 
 function obterDataHoraMinima() {
-  const agora = new Date();
-
-  agora.setSeconds(0);
-  agora.setMilliseconds(0);
-
   return formatarDataHoraLocal(
-    agora,
+    new Date(),
   );
 }
 
@@ -64,19 +74,31 @@ function obterDataHoraMaxima() {
     limite.getFullYear() + 1,
   );
 
-  limite.setSeconds(0);
-  limite.setMilliseconds(0);
-
   return formatarDataHoraLocal(
     limite,
   );
 }
 
+async function obterMensagemErro(
+  response: Response,
+  fallback: string,
+) {
+  try {
+    const body =
+      (await response.json()) as ApiError;
+
+    return body.message || fallback;
+  } catch {
+    return fallback;
+  }
+}
+
 export default function NewAppointmentPage() {
   const navigate = useNavigate();
 
-  const [pets, setPets] =
-    useState<Pet[]>([]);
+  const [pets, setPets] = useState<
+    Pet[]
+  >([]);
 
   const [servicos, setServicos] =
     useState<Servico[]>([]);
@@ -108,6 +130,11 @@ export default function NewAppointmentPage() {
   const [carregando, setCarregando] =
     useState(true);
 
+  const [
+    carregandoProfissionais,
+    setCarregandoProfissionais,
+  ] = useState(false);
+
   const [salvando, setSalvando] =
     useState(false);
 
@@ -116,25 +143,27 @@ export default function NewAppointmentPage() {
 
   const dataHoraMinima =
     useMemo(
-      () => obterDataHoraMinima(),
+      () =>
+        obterDataHoraMinima(),
       [],
     );
 
   const dataHoraMaxima =
     useMemo(
-      () => obterDataHoraMaxima(),
+      () =>
+        obterDataHoraMaxima(),
       [],
     );
 
   useEffect(() => {
     async function carregarDados() {
-      try {
-        setErro("");
+      setCarregando(true);
+      setErro("");
 
+      try {
         const [
           petsResponse,
           servicosResponse,
-          profissionaisResponse,
         ] = await Promise.all([
           fetch("/api/pets", {
             credentials: "include",
@@ -143,50 +172,41 @@ export default function NewAppointmentPage() {
           fetch("/api/servicos", {
             credentials: "include",
           }),
-
-          fetch("/api/profissionais", {
-            credentials: "include",
-          }),
         ]);
 
-        if (
-          !petsResponse.ok ||
-          !servicosResponse.ok ||
-          !profissionaisResponse.ok
-        ) {
+        if (!petsResponse.ok) {
           throw new Error(
-            "Não foi possível carregar os dados do agendamento",
+            await obterMensagemErro(
+              petsResponse,
+              "Não foi possível carregar os pets",
+            ),
           );
         }
 
-        const [
-          petsData,
-          servicosData,
-          profissionaisData,
-        ] = await Promise.all([
-          petsResponse.json(),
-          servicosResponse.json(),
-          profissionaisResponse.json(),
-        ]);
+        if (!servicosResponse.ok) {
+          throw new Error(
+            await obterMensagemErro(
+              servicosResponse,
+              "Não foi possível carregar os serviços",
+            ),
+          );
+        }
+
+        const petsData =
+          (await petsResponse.json()) as Pet[];
+
+        const servicosData =
+          (await servicosResponse.json()) as Servico[];
 
         const petsAtivos =
           petsData.filter(
-            (pet: Pet) => pet.ativo,
+            (pet) => pet.ativo,
           );
 
         const servicosAtivos =
           servicosData.filter(
-            (servico: Servico) =>
+            (servico) =>
               servico.ativo,
-          );
-
-        const profissionaisAtivos =
-          profissionaisData.filter(
-            (
-              profissional:
-                Profissional,
-            ) =>
-              profissional.ativo,
           );
 
         setPets(
@@ -195,10 +215,6 @@ export default function NewAppointmentPage() {
 
         setServicos(
           servicosAtivos,
-        );
-
-        setProfissionais(
-          profissionaisAtivos,
         );
 
         if (
@@ -212,7 +228,8 @@ export default function NewAppointmentPage() {
         }
 
         if (
-          servicosAtivos.length === 1
+          servicosAtivos.length ===
+          1
         ) {
           setServicoId(
             String(
@@ -220,22 +237,16 @@ export default function NewAppointmentPage() {
             ),
           );
         }
-
-        if (
-          profissionaisAtivos.length ===
-          1
-        ) {
-          setProfissionalId(
-            String(
-              profissionaisAtivos[0]
-                .id,
-            ),
-          );
-        }
       } catch (error) {
-        if (error instanceof Error) {
+        if (
+          error instanceof Error
+        ) {
           setErro(
             error.message,
+          );
+        } else {
+          setErro(
+            "Não foi possível carregar os dados do agendamento",
           );
         }
       } finally {
@@ -243,21 +254,135 @@ export default function NewAppointmentPage() {
       }
     }
 
-    carregarDados();
+    void carregarDados();
   }, []);
 
-  function validarDataNoFrontend() {
-    if (!dataHora) {
-      throw new Error(
-        "Selecione a data e o horário",
+  useEffect(() => {
+    async function carregarProfissionais() {
+      setProfissionais([]);
+      setProfissionalId("");
+
+      if (!servicoId) {
+        return;
+      }
+
+      setCarregandoProfissionais(
+        true,
       );
+
+      setErro("");
+
+      try {
+        const response =
+          await fetch(
+            `/api/profissionais/por-servico/${servicoId}`,
+            {
+              credentials:
+                "include",
+            },
+          );
+
+        if (!response.ok) {
+          throw new Error(
+            await obterMensagemErro(
+              response,
+              "Não foi possível carregar os profissionais",
+            ),
+          );
+        }
+
+        const data =
+          (await response.json()) as Profissional[];
+
+        const ativos =
+          data.filter(
+            (profissional) =>
+              profissional.ativo,
+          );
+
+        setProfissionais(
+          ativos,
+        );
+
+        if (
+          ativos.length === 1
+        ) {
+          setProfissionalId(
+            String(
+              ativos[0].id,
+            ),
+          );
+        }
+      } catch (error) {
+        if (
+          error instanceof Error
+        ) {
+          setErro(
+            error.message,
+          );
+        } else {
+          setErro(
+            "Não foi possível carregar os profissionais",
+          );
+        }
+      } finally {
+        setCarregandoProfissionais(
+          false,
+        );
+      }
+    }
+
+    void carregarProfissionais();
+  }, [servicoId]);
+
+  async function handleSubmit(
+    event: FormEvent<HTMLFormElement>,
+  ) {
+    event.preventDefault();
+
+    setErro("");
+
+    if (
+      !petId ||
+      !servicoId ||
+      !profissionalId ||
+      !dataHora
+    ) {
+      setErro(
+        "Preencha todos os campos obrigatórios",
+      );
+
+      return;
     }
 
     const dataSelecionada =
       new Date(dataHora);
 
+    if (
+      Number.isNaN(
+        dataSelecionada.getTime(),
+      )
+    ) {
+      setErro(
+        "Informe uma data e horário válidos",
+      );
+
+      return;
+    }
+
     const agora =
       new Date();
+
+    if (
+      dataSelecionada.getTime() <=
+      agora.getTime()
+    ) {
+      setErro(
+        "Não é possível agendar para uma data ou horário no passado",
+      );
+
+      return;
+    }
 
     const limiteMaximo =
       new Date();
@@ -268,104 +393,80 @@ export default function NewAppointmentPage() {
     );
 
     if (
-      Number.isNaN(
-        dataSelecionada.getTime(),
-      )
-    ) {
-      throw new Error(
-        "Data e horário inválidos",
-      );
-    }
-
-    if (
-      dataSelecionada.getTime() <=
-      agora.getTime()
-    ) {
-      throw new Error(
-        "Escolha uma data e horário futuros",
-      );
-    }
-
-    if (
       dataSelecionada.getTime() >
       limiteMaximo.getTime()
     ) {
-      throw new Error(
+      setErro(
         "O agendamento pode ser realizado com no máximo 1 ano de antecedência",
       );
+
+      return;
     }
-  }
 
-  async function cadastrarAgendamento(
-    event: FormEvent,
-  ) {
-    event.preventDefault();
-
-    setErro("");
+    setSalvando(true);
 
     try {
-      validarDataNoFrontend();
+      const response =
+        await fetch(
+          "/api/agendamentos",
+          {
+            method: "POST",
 
-      setSalvando(true);
+            credentials:
+              "include",
 
-      const response = await fetch(
-        "/api/agendamentos",
-        {
-          method: "POST",
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
 
-          credentials: "include",
+            body: JSON.stringify({
+              petId:
+                Number(petId),
 
-          headers: {
-            "Content-Type":
-              "application/json",
+              servicoId:
+                Number(
+                  servicoId,
+                ),
+
+              profissionalId:
+                Number(
+                  profissionalId,
+                ),
+
+              dataHora:
+                dataSelecionada.toISOString(),
+
+              observacoes:
+                observacoes.trim()
+                  ? observacoes.trim()
+                  : undefined,
+            }),
           },
-
-          body: JSON.stringify({
-            petId: Number(petId),
-
-            servicoId:
-              Number(servicoId),
-
-            profissionalId:
-              Number(profissionalId),
-
-            dataHora: new Date(
-              dataHora,
-            ).toISOString(),
-
-            observacoes:
-              observacoes.trim() ||
-              undefined,
-          }),
-        },
-      );
-
-      const data =
-        await response.json();
-
-      if (!response.ok) {
-        setErro(
-          data.message ??
-            "Não foi possível realizar o agendamento",
         );
 
-        return;
+      if (!response.ok) {
+        throw new Error(
+          await obterMensagemErro(
+            response,
+            "Não foi possível criar o agendamento",
+          ),
+        );
       }
 
       navigate(
         "/agendamentos",
-        {
-          replace: true,
-        },
       );
     } catch (error) {
-      if (error instanceof Error) {
+      if (
+        error instanceof Error
+      ) {
         setErro(
           error.message,
         );
       } else {
         setErro(
-          "Não foi possível conectar com a API",
+          "Não foi possível criar o agendamento",
         );
       }
     } finally {
@@ -373,33 +474,69 @@ export default function NewAppointmentPage() {
     }
   }
 
-  async function sair() {
+  async function handleLogout() {
     try {
       await fetch(
         "/api/auth/logout",
         {
           method: "POST",
-          credentials: "include",
+          credentials:
+            "include",
         },
       );
     } finally {
       navigate(
         "/login",
-        {
-          replace: true,
-        },
       );
     }
   }
 
   if (carregando) {
     return (
-      <div className="loading-screen">
-        <div className="loading-spinner" />
+      <div className="dashboard-layout">
+        <aside className="dashboard-sidebar">
+          <div>
+            <div className="sidebar-brand">
+              <div className="sidebar-logo">
+                AP
+              </div>
 
-        <span>
-          Carregando dados...
-        </span>
+              <div>
+                <strong>
+                  Agenda Pet
+                </strong>
+
+                <span>
+                  Gestão simples
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <button
+            className="sidebar-logout"
+            type="button"
+            onClick={
+              handleLogout
+            }
+          >
+            Sair
+          </button>
+        </aside>
+
+        <main className="dashboard-main">
+          <div className="empty-state">
+            <h3>
+              Carregando...
+            </h3>
+
+            <p>
+              Buscando os dados
+              necessários para o
+              agendamento.
+            </p>
+          </div>
+        </main>
       </div>
     );
   }
@@ -425,52 +562,72 @@ export default function NewAppointmentPage() {
           </div>
 
           <nav className="sidebar-nav">
-            <Link
+            <NavLink
               to="/dashboard"
-              className="sidebar-link"
+              className={({
+                isActive,
+              }) =>
+                `sidebar-link ${
+                  isActive
+                    ? "active"
+                    : ""
+                }`
+              }
             >
               <span className="nav-icon">
                 D
               </span>
 
               Dashboard
-            </Link>
+            </NavLink>
 
-            <Link
+            <NavLink
               to="/pets"
-              className="sidebar-link"
+              className={({
+                isActive,
+              }) =>
+                `sidebar-link ${
+                  isActive
+                    ? "active"
+                    : ""
+                }`
+              }
             >
               <span className="nav-icon">
                 P
               </span>
 
               Meus Pets
-            </Link>
+            </NavLink>
 
-            <Link
+            <NavLink
               to="/agendamentos"
-              className="sidebar-link active"
+              className={() =>
+                "sidebar-link active"
+              }
             >
               <span className="nav-icon">
                 A
               </span>
 
               Agendamentos
-            </Link>
+            </NavLink>
           </nav>
         </div>
 
         <button
-          type="button"
           className="sidebar-logout"
-          onClick={sair}
+          type="button"
+          onClick={
+            handleLogout
+          }
         >
           Sair
         </button>
       </aside>
 
-      <main className="appointment-form-page">
-        <header className="appointment-form-header">
+      <main className="dashboard-main">
+        <header className="appointment-page-header">
           <div>
             <span className="dashboard-eyebrow">
               Agenda
@@ -481,14 +638,16 @@ export default function NewAppointmentPage() {
             </h1>
 
             <p>
-              Escolha o pet, serviço,
-              profissional e horário.
+              Escolha o pet,
+              serviço,
+              profissional e
+              horário.
             </p>
           </div>
 
           <Link
+            className="appointment-back-button"
             to="/agendamentos"
-            className="appointment-form-back"
           >
             ← Voltar
           </Link>
@@ -500,99 +659,113 @@ export default function NewAppointmentPage() {
           </div>
         )}
 
-        <div className="appointment-form-layout">
+        <div className="appointment-form-grid">
           <section className="appointment-form-card">
-            <div className="appointment-form-card-header">
+            <div className="appointment-form-title">
               <div className="appointment-form-icon">
                 +
               </div>
 
               <div>
                 <h2>
-                  Dados do agendamento
+                  Dados do
+                  agendamento
                 </h2>
 
                 <p>
-                  Preencha as informações
-                  para reservar o atendimento.
+                  Preencha as
+                  informações para
+                  reservar o
+                  atendimento.
                 </p>
               </div>
             </div>
 
             {pets.length === 0 ? (
-              <div className="appointment-form-empty">
+              <div className="empty-state">
                 <h3>
-                  Nenhum pet disponível
+                  Nenhum pet
+                  disponível
                 </h3>
 
                 <p>
-                  Você precisa cadastrar
-                  um pet ativo antes de
-                  realizar um agendamento.
+                  Você precisa
+                  cadastrar um pet
+                  ativo antes de
+                  realizar um
+                  agendamento.
                 </p>
 
                 <Link
+                  className="primary-button"
                   to="/pets/novo"
-                  className="form-primary-button"
                 >
                   Cadastrar pet
                 </Link>
               </div>
             ) : (
               <form
-                className="appointment-form"
                 onSubmit={
-                  cadastrarAgendamento
+                  handleSubmit
                 }
               >
                 <div className="appointment-form-section">
-                  <div className="appointment-section-number">
+                  <div className="appointment-step">
                     1
                   </div>
 
                   <div className="appointment-section-content">
                     <h3>
-                      Quem será atendido?
+                      Quem será
+                      atendido?
                     </h3>
 
-                    <div className="form-field">
-                      <label htmlFor="pet">
-                        Pet
-                      </label>
+                    <label>
+                      Pet
 
                       <select
-                        id="pet"
-                        value={petId}
-                        onChange={(event) =>
+                        value={
+                          petId
+                        }
+                        onChange={(
+                          event,
+                        ) =>
                           setPetId(
-                            event.target.value,
+                            event
+                              .target
+                              .value,
                           )
                         }
                         required
                       >
                         <option value="">
-                          Selecione um pet
+                          Selecione
+                          um pet
                         </option>
 
                         {pets.map(
                           (pet) => (
                             <option
-                              key={pet.id}
-                              value={pet.id}
+                              key={
+                                pet.id
+                              }
+                              value={
+                                pet.id
+                              }
                             >
-                              {pet.nome}
+                              {
+                                pet.nome
+                              }
                             </option>
                           ),
                         )}
                       </select>
-                    </div>
+                    </label>
                   </div>
                 </div>
 
-                <div className="appointment-form-divider" />
-
                 <div className="appointment-form-section">
-                  <div className="appointment-section-number">
+                  <div className="appointment-step">
                     2
                   </div>
 
@@ -601,18 +774,20 @@ export default function NewAppointmentPage() {
                       Qual serviço?
                     </h3>
 
-                    <div className="form-row">
-                      <div className="form-field">
-                        <label htmlFor="servico">
-                          Serviço
-                        </label>
+                    <div className="appointment-fields-row">
+                      <label>
+                        Serviço
 
                         <select
-                          id="servico"
-                          value={servicoId}
-                          onChange={(event) =>
+                          value={
+                            servicoId
+                          }
+                          onChange={(
+                            event,
+                          ) =>
                             setServicoId(
-                              event.target
+                              event
+                                .target
                                 .value,
                             )
                           }
@@ -620,10 +795,13 @@ export default function NewAppointmentPage() {
                         >
                           <option value="">
                             Selecione
+                            um serviço
                           </option>
 
                           {servicos.map(
-                            (servico) => (
+                            (
+                              servico,
+                            ) => (
                               <option
                                 key={
                                   servico.id
@@ -644,32 +822,71 @@ export default function NewAppointmentPage() {
                             ),
                           )}
                         </select>
-                      </div>
+                      </label>
 
-                      <div className="form-field">
-                        <label htmlFor="profissional">
-                          Profissional
-                        </label>
+                      <label>
+                        Profissional
 
                         <select
-                          id="profissional"
                           value={
                             profissionalId
                           }
-                          onChange={(event) =>
+                          onChange={(
+                            event,
+                          ) =>
                             setProfissionalId(
-                              event.target
+                              event
+                                .target
                                 .value,
                             )
                           }
+                          disabled={
+                            !servicoId ||
+                            carregandoProfissionais
+                          }
                           required
                         >
-                          <option value="">
-                            Selecione
-                          </option>
+                          {!servicoId && (
+                            <option value="">
+                              Escolha
+                              primeiro
+                              um serviço
+                            </option>
+                          )}
+
+                          {servicoId &&
+                            carregandoProfissionais && (
+                              <option value="">
+                                Carregando...
+                              </option>
+                            )}
+
+                          {servicoId &&
+                            !carregandoProfissionais &&
+                            profissionais.length ===
+                              0 && (
+                              <option value="">
+                                Nenhum
+                                profissional
+                                disponível
+                              </option>
+                            )}
+
+                          {servicoId &&
+                            !carregandoProfissionais &&
+                            profissionais.length >
+                              0 && (
+                              <option value="">
+                                Selecione
+                                um
+                                profissional
+                              </option>
+                            )}
 
                           {profissionais.map(
-                            (profissional) => (
+                            (
+                              profissional,
+                            ) => (
                               <option
                                 key={
                                   profissional.id
@@ -685,15 +902,13 @@ export default function NewAppointmentPage() {
                             ),
                           )}
                         </select>
-                      </div>
+                      </label>
                     </div>
                   </div>
                 </div>
 
-                <div className="appointment-form-divider" />
-
                 <div className="appointment-form-section">
-                  <div className="appointment-section-number">
+                  <div className="appointment-step">
                     3
                   </div>
 
@@ -702,100 +917,92 @@ export default function NewAppointmentPage() {
                       Quando?
                     </h3>
 
-                    <div className="form-field">
-                      <label htmlFor="dataHora">
-                        Data e horário
-                      </label>
+                    <label>
+                      Data e horário
 
                       <input
-                        id="dataHora"
                         type="datetime-local"
-
+                        value={
+                          dataHora
+                        }
                         min={
                           dataHoraMinima
                         }
-
                         max={
                           dataHoraMaxima
                         }
-
-                        value={dataHora}
-
-                        onChange={(event) =>
+                        onChange={(
+                          event,
+                        ) =>
                           setDataHora(
-                            event.target
+                            event
+                              .target
                               .value,
                           )
                         }
-
                         required
                       />
 
-                      <span className="form-help">
-                        Entre agora e
-                        no máximo 1 ano
-                        no futuro.
-                      </span>
-                    </div>
+                      <small>
+                        Entre agora
+                        e no máximo
+                        1 ano no
+                        futuro.
+                      </small>
+                    </label>
                   </div>
                 </div>
 
-                <div className="appointment-form-divider" />
-
                 <div className="appointment-form-section">
-                  <div className="appointment-section-number">
+                  <div className="appointment-step">
                     4
                   </div>
 
                   <div className="appointment-section-content">
                     <h3>
-                      Alguma observação?
+                      Alguma
+                      observação?
                     </h3>
 
-                    <div className="form-field">
-                      <label htmlFor="observacoes">
-                        Observações
-                      </label>
+                    <label>
+                      Observações
 
                       <textarea
-                        id="observacoes"
-
                         value={
                           observacoes
                         }
-
-                        onChange={(event) =>
+                        onChange={(
+                          event,
+                        ) =>
                           setObservacoes(
-                            event.target
+                            event
+                              .target
                               .value,
                           )
                         }
-
                         placeholder="Ex.: informações importantes sobre o atendimento"
-
                         rows={4}
                       />
-
-                      <span className="form-help">
-                        Campo opcional.
-                      </span>
-                    </div>
+                    </label>
                   </div>
                 </div>
 
                 <div className="appointment-form-actions">
                   <Link
+                    className="appointment-cancel-button"
                     to="/agendamentos"
-                    className="form-secondary-button"
                   >
                     Cancelar
                   </Link>
 
                   <button
+                    className="appointment-submit-button"
                     type="submit"
-                    className="form-primary-button"
                     disabled={
-                      salvando
+                      salvando ||
+                      carregandoProfissionais ||
+                      profissionais.length ===
+                        0
                     }
                   >
                     {salvando
@@ -807,8 +1014,8 @@ export default function NewAppointmentPage() {
             )}
           </section>
 
-          <aside className="appointment-form-info">
-            <span className="appointment-info-label">
+          <aside className="appointment-info-card">
+            <span className="appointment-info-eyebrow">
               Novo agendamento
             </span>
 
@@ -817,61 +1024,71 @@ export default function NewAppointmentPage() {
             </h2>
 
             <p>
-              Escolha as informações
-              do atendimento e confirme
-              o horário.
+              Escolha as
+              informações do
+              atendimento e
+              confirme o horário.
             </p>
 
-            <div className="appointment-info-step">
-              <span>
-                01
-              </span>
-
+            <div className="appointment-info-steps">
               <div>
-                <strong>
-                  Escolha o pet
-                </strong>
+                <span>
+                  01
+                </span>
 
-                <p>
-                  Apenas seus pets ativos
-                  ficam disponíveis.
-                </p>
+                <div>
+                  <strong>
+                    Escolha o pet
+                  </strong>
+
+                  <p>
+                    Apenas seus
+                    pets ativos
+                    ficam
+                    disponíveis.
+                  </p>
+                </div>
               </div>
-            </div>
-
-            <div className="appointment-info-step">
-              <span>
-                02
-              </span>
 
               <div>
-                <strong>
-                  Serviço e profissional
-                </strong>
+                <span>
+                  02
+                </span>
 
-                <p>
-                  O profissional precisa
-                  realizar o serviço
-                  selecionado.
-                </p>
+                <div>
+                  <strong>
+                    Serviço e
+                    profissional
+                  </strong>
+
+                  <p>
+                    O profissional
+                    precisa
+                    realizar o
+                    serviço
+                    selecionado.
+                  </p>
+                </div>
               </div>
-            </div>
-
-            <div className="appointment-info-step">
-              <span>
-                03
-              </span>
 
               <div>
-                <strong>
-                  Data e horário
-                </strong>
+                <span>
+                  03
+                </span>
 
-                <p>
-                  O sistema verifica
-                  conflitos antes de
-                  confirmar.
-                </p>
+                <div>
+                  <strong>
+                    Data e horário
+                  </strong>
+
+                  <p>
+                    O sistema
+                    verifica
+                    conflitos
+                    antes de
+                    confirmar.
+                  </p>
+                </div>
               </div>
             </div>
           </aside>

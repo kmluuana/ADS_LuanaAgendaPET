@@ -1,10 +1,28 @@
 import { db } from "../prisma/db";
 
+type CriarProfissionalInput = {
+  nome: string;
+  email: string;
+  telefone: string;
+};
+
+type AtualizarProfissionalInput = {
+  nome: string;
+  email: string;
+  telefone: string;
+};
+
 export async function listarProfissionais() {
-  return db.profissional.findMany();
+  return db.profissional.findMany({
+    orderBy: {
+      nome: "asc",
+    },
+  });
 }
 
-export async function obterProfissionalPorId(id: number) {
+export async function obterProfissionalPorId(
+  id: number,
+) {
   return db.profissional.findUnique({
     where: {
       id,
@@ -12,7 +30,9 @@ export async function obterProfissionalPorId(id: number) {
   });
 }
 
-export async function obterProfissionalPorEmail(email: string) {
+export async function obterProfissionalPorEmail(
+  email: string,
+) {
   return db.profissional.findUnique({
     where: {
       email,
@@ -20,11 +40,9 @@ export async function obterProfissionalPorEmail(email: string) {
   });
 }
 
-export async function criarProfissional(dados: {
-  nome: string;
-  email: string;
-  telefone: string;
-}) {
+export async function criarProfissional(
+  dados: CriarProfissionalInput,
+) {
   return db.profissional.create({
     data: {
       nome: dados.nome,
@@ -36,11 +54,7 @@ export async function criarProfissional(dados: {
 
 export async function atualizarProfissional(
   id: number,
-  dados: {
-    nome: string;
-    email: string;
-    telefone: string;
-  },
+  dados: AtualizarProfissionalInput,
 ) {
   return db.profissional.update({
     where: {

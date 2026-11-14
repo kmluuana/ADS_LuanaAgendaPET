@@ -1,10 +1,11 @@
 import {
   useEffect,
-  useMemo,
   useState,
 } from "react";
+
 import {
   Link,
+  NavLink,
   useNavigate,
 } from "react-router";
 
@@ -14,46 +15,160 @@ type Usuario = {
   id: number;
   nome: string;
   email: string;
-  perfil:
-    | "CLIENTE"
-    | "ATENDENTE"
-    | "ADMINISTRADOR";
-  clienteId: number | null;
+  perfil: string;
+  clienteId?: number | null;
 };
+
+type AuthMeResponse =
+  | Usuario
+  | {
+      usuario: Usuario;
+    }
+  | {
+      user: Usuario;
+    };
 
 type Pet = {
   id: number;
   nome: string;
   especie: string;
+  raca?: string | null;
   ativo: boolean;
+};
+
+type Servico = {
+  id: number;
+  nome: string;
+  duracao: number;
+};
+
+type Profissional = {
+  id: number;
+  nome: string;
 };
 
 type Agendamento = {
   id: number;
   dataHora: string;
-  status:
-    | "AGENDADO"
-    | "CONCLUIDO"
-    | "CANCELADO";
+  status: string;
 
-  pet: {
-    nome: string;
-  };
-
-  servico: {
-    nome: string;
-  };
-
-  profissional: {
-    nome: string;
-  };
+  pet: Pet;
+  servico: Servico;
+  profissional: Profissional;
 };
 
-export default function DashboardPage() {
-  const navigate = useNavigate();
+type ApiError = {
+  message?: string;
+};
 
-  const [usuario, setUsuario] =
-    useState<Usuario | null>(null);
+async function obterMensagemErro(
+  response: Response,
+  fallback: string,
+) {
+  try {
+    const body =
+      (await response.json()) as ApiError;
+
+    return body.message || fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function extrairUsuario(
+  data: AuthMeResponse,
+): Usuario {
+  if ("usuario" in data) {
+    return data.usuario;
+  }
+
+  if ("user" in data) {
+    return data.user;
+  }
+
+  return data;
+}
+
+function obterIniciais(
+  nome?: string | null,
+) {
+  const nomeLimpo =
+    nome?.trim();
+
+  if (!nomeLimpo) {
+    return "AP";
+  }
+
+  const partes =
+    nomeLimpo
+      .split(/\s+/)
+      .filter(Boolean);
+
+  if (partes.length === 1) {
+    return partes[0]
+      .slice(0, 2)
+      .toUpperCase();
+  }
+
+  return (
+    partes[0][0] +
+    partes[partes.length - 1][0]
+  ).toUpperCase();
+}
+
+function formatarDia(
+  dataHora: string,
+) {
+  return new Intl.DateTimeFormat(
+    "pt-BR",
+    {
+      day: "2-digit",
+    },
+  ).format(
+    new Date(dataHora),
+  );
+}
+
+function formatarMes(
+  dataHora: string,
+) {
+  return new Intl.DateTimeFormat(
+    "pt-BR",
+    {
+      month: "short",
+    },
+  )
+    .format(
+      new Date(dataHora),
+    )
+    .replace(".", "")
+    .toUpperCase();
+}
+
+function formatarHorario(
+  dataHora: string,
+) {
+  return new Intl.DateTimeFormat(
+    "pt-BR",
+    {
+      hour: "2-digit",
+      minute: "2-digit",
+    },
+  ).format(
+    new Date(dataHora),
+  );
+}
+
+export default function DashboardPage() {
+  const navigate =
+    useNavigate();
+
+  const [
+    usuario,
+    setUsuario,
+  ] = useState<Usuario | null>(
+    null,
+  );
 
   const [pets, setPets] =
     useState<Pet[]>([]);
@@ -61,178 +176,240 @@ export default function DashboardPage() {
   const [
     agendamentos,
     setAgendamentos,
-  ] = useState<Agendamento[]>([]);
+  ] = useState<
+    Agendamento[]
+  >([]);
 
-  const [carregando, setCarregando] =
-    useState(true);
+  const [
+    carregando,
+    setCarregando,
+  ] = useState(true);
 
   const [erro, setErro] =
     useState("");
 
   useEffect(() => {
     async function carregarDashboard() {
+      setCarregando(true);
+      setErro("");
+
       try {
         const [
           usuarioResponse,
           petsResponse,
           agendamentosResponse,
         ] = await Promise.all([
-          fetch("/api/auth/me", {
-            credentials: "include",
-          }),
+          fetch(
+            "/api/auth/me",
+            {
+              credentials:
+                "include",
+            },
+          ),
 
-          fetch("/api/pets", {
-            credentials: "include",
-          }),
+          fetch(
+            "/api/pets",
+            {
+              credentials:
+                "include",
+            },
+          ),
 
-          fetch("/api/agendamentos", {
-            credentials: "include",
-          }),
+          fetch(
+            "/api/agendamentos",
+            {
+              credentials:
+                "include",
+            },
+          ),
         ]);
 
-        if (!usuarioResponse.ok) {
-          navigate("/login", {
-            replace: true,
-          });
-
-          return;
-        }
-
         if (
-          !petsResponse.ok ||
-          !agendamentosResponse.ok
+          !usuarioResponse.ok
         ) {
+          if (
+            usuarioResponse.status ===
+            401
+          ) {
+            navigate(
+              "/login",
+            );
+
+            return;
+          }
+
           throw new Error(
-            "Não foi possível carregar o dashboard",
+            await obterMensagemErro(
+              usuarioResponse,
+              "Não foi possível carregar o usuário",
+            ),
           );
         }
 
-        const usuarioData =
-          await usuarioResponse.json();
+        if (
+          !petsResponse.ok
+        ) {
+          throw new Error(
+            await obterMensagemErro(
+              petsResponse,
+              "Não foi possível carregar os pets",
+            ),
+          );
+        }
+
+        if (
+          !agendamentosResponse.ok
+        ) {
+          throw new Error(
+            await obterMensagemErro(
+              agendamentosResponse,
+              "Não foi possível carregar os agendamentos",
+            ),
+          );
+        }
+
+        const usuarioResponseData =
+          (await usuarioResponse.json()) as AuthMeResponse;
 
         const petsData =
-          await petsResponse.json();
+          (await petsResponse.json()) as Pet[];
 
         const agendamentosData =
-          await agendamentosResponse.json();
+          (await agendamentosResponse.json()) as Agendamento[];
 
-        setUsuario(usuarioData.usuario);
-        setPets(petsData);
+        const usuarioData =
+          extrairUsuario(
+            usuarioResponseData,
+          );
+
+        setUsuario(
+          usuarioData,
+        );
+
+        setPets(
+          petsData,
+        );
+
         setAgendamentos(
           agendamentosData,
         );
       } catch (error) {
-        if (error instanceof Error) {
-          setErro(error.message);
+        if (
+          error instanceof Error
+        ) {
+          setErro(
+            error.message,
+          );
+        } else {
+          setErro(
+            "Não foi possível carregar o dashboard",
+          );
         }
       } finally {
         setCarregando(false);
       }
     }
 
-    carregarDashboard();
+    void carregarDashboard();
   }, [navigate]);
 
-  const petsAtivos = useMemo(
-    () =>
-      pets.filter(
-        (pet) => pet.ativo,
-      ).length,
-    [pets],
-  );
-
-  const agendamentosAtivos =
-    useMemo(
-      () =>
-        agendamentos.filter(
-          (agendamento) =>
-            agendamento.status ===
-            "AGENDADO",
-        ),
-      [agendamentos],
-    );
-
-  const proximoAgendamento =
-    useMemo(() => {
-      const agora = new Date();
-
-      return [...agendamentosAtivos]
-        .filter(
-          (agendamento) =>
-            new Date(
-              agendamento.dataHora,
-            ) >= agora,
-        )
-        .sort(
-          (a, b) =>
-            new Date(
-              a.dataHora,
-            ).getTime() -
-            new Date(
-              b.dataHora,
-            ).getTime(),
-        )[0];
-    }, [agendamentosAtivos]);
-
-  async function sair() {
+  async function handleLogout() {
     try {
       await fetch(
         "/api/auth/logout",
         {
           method: "POST",
-          credentials: "include",
+          credentials:
+            "include",
         },
       );
     } finally {
-      navigate("/login", {
-        replace: true,
-      });
+      navigate(
+        "/login",
+      );
     }
   }
 
-  function obterPrimeiroNome() {
-    if (!usuario?.nome) {
-      return "";
-    }
+  const petsAtivos =
+    pets.filter(
+      (pet) => pet.ativo,
+    );
 
-    return usuario.nome
-      .trim()
-      .split(" ")[0];
-  }
+  const agendamentosAtivos =
+    agendamentos.filter(
+      (agendamento) =>
+        agendamento.status ===
+        "AGENDADO",
+    );
 
-  function obterIniciais() {
-    if (!usuario?.nome) {
-      return "AP";
-    }
+  const agora =
+    new Date();
 
-    const partes =
-      usuario.nome
-        .trim()
-        .split(" ")
-        .filter(Boolean);
-
-    if (partes.length === 1) {
-      return partes[0]
-        .substring(0, 2)
-        .toUpperCase();
-    }
-
-    return (
-      partes[0][0] +
-      partes[
-        partes.length - 1
-      ][0]
-    ).toUpperCase();
-  }
+  const proximoAgendamento =
+    agendamentosAtivos
+      .filter(
+        (agendamento) =>
+          new Date(
+            agendamento.dataHora,
+          ).getTime() >
+          agora.getTime(),
+      )
+      .sort(
+        (a, b) =>
+          new Date(
+            a.dataHora,
+          ).getTime() -
+          new Date(
+            b.dataHora,
+          ).getTime(),
+      )[0] ?? null;
 
   if (carregando) {
     return (
-      <div className="loading-screen">
-        <div className="loading-spinner" />
+      <div className="dashboard-layout">
+        <aside className="dashboard-sidebar">
+          <div>
+            <div className="sidebar-brand">
+              <div className="sidebar-logo">
+                AP
+              </div>
 
-        <span>
-          Carregando dashboard...
-        </span>
+              <div>
+                <strong>
+                  Agenda Pet
+                </strong>
+
+                <span>
+                  Gestão simples
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <button
+            className="sidebar-logout"
+            type="button"
+            onClick={
+              handleLogout
+            }
+          >
+            Sair
+          </button>
+        </aside>
+
+        <main className="dashboard-main">
+          <div className="empty-state">
+            <h3>
+              Carregando...
+            </h3>
+
+            <p>
+              Buscando as
+              informações do
+              dashboard.
+            </p>
+          </div>
+        </main>
       </div>
     );
   }
@@ -258,45 +435,71 @@ export default function DashboardPage() {
           </div>
 
           <nav className="sidebar-nav">
-            <Link
+            <NavLink
               to="/dashboard"
-              className="sidebar-link active"
+              className={({
+                isActive,
+              }) =>
+                `sidebar-link ${
+                  isActive
+                    ? "active"
+                    : ""
+                }`
+              }
             >
               <span className="nav-icon">
                 D
               </span>
 
               Dashboard
-            </Link>
+            </NavLink>
 
-            <Link
+            <NavLink
               to="/pets"
-              className="sidebar-link"
+              className={({
+                isActive,
+              }) =>
+                `sidebar-link ${
+                  isActive
+                    ? "active"
+                    : ""
+                }`
+              }
             >
               <span className="nav-icon">
                 P
               </span>
 
               Meus Pets
-            </Link>
+            </NavLink>
 
-            <Link
+            <NavLink
               to="/agendamentos"
-              className="sidebar-link"
+              className={({
+                isActive,
+              }) =>
+                `sidebar-link ${
+                  isActive
+                    ? "active"
+                    : ""
+                }`
+              }
             >
               <span className="nav-icon">
                 A
               </span>
 
               Agendamentos
-            </Link>
+            </NavLink>
           </nav>
         </div>
 
         <button
           className="sidebar-logout"
           type="button"
-          onClick={sair}
+          onClick={
+            handleLogout
+          }
         >
           Sair
         </button>
@@ -311,30 +514,40 @@ export default function DashboardPage() {
 
             <h1>
               Olá,{" "}
-              {obterPrimeiroNome()}.
+              {usuario?.nome
+                ?.split(" ")[0] ||
+                "Cliente"}
+              .
             </h1>
 
             <p>
-              Acompanhe seus pets e
-              próximos agendamentos.
+              Acompanhe seus pets
+              e próximos
+              agendamentos.
             </p>
           </div>
 
-          <div className="dashboard-user">
-            <div className="user-info">
-              <strong>
-                {usuario?.nome}
-              </strong>
+          {usuario && (
+            <div className="dashboard-user">
+              <div className="user-info">
+                <strong>
+                  {usuario.nome ??
+                    "Cliente"}
+                </strong>
 
-              <span>
-                {usuario?.email}
-              </span>
-            </div>
+                <span>
+                  {usuario.email ??
+                    ""}
+                </span>
+              </div>
 
-            <div className="user-avatar">
-              {obterIniciais()}
+              <div className="user-avatar">
+                {obterIniciais(
+                  usuario.nome,
+                )}
+              </div>
             </div>
-          </div>
+          )}
         </header>
 
         {erro && (
@@ -358,12 +571,15 @@ export default function DashboardPage() {
               </span>
 
               <h2>
-                Agende o próximo serviço do seu pet
+                Agende o próximo
+                serviço do seu pet
               </h2>
 
               <p>
-                Escolha seu pet, serviço,
-                profissional, data e horário.
+                Escolha seu pet,
+                serviço,
+                profissional,
+                data e horário.
               </p>
             </div>
           </div>
@@ -379,7 +595,7 @@ export default function DashboardPage() {
           </div>
         </Link>
 
-        <section className="dashboard-stats">
+        <div className="dashboard-stats">
           <Link
             to="/pets"
             className="stat-card"
@@ -389,13 +605,13 @@ export default function DashboardPage() {
                 Pets ativos
               </span>
 
-              <span className="stat-icon">
+              <div className="stat-icon">
                 P
-              </span>
+              </div>
             </div>
 
             <strong className="stat-value">
-              {petsAtivos}
+              {petsAtivos.length}
             </strong>
 
             <span className="stat-footer">
@@ -412,9 +628,9 @@ export default function DashboardPage() {
                 Agendamentos
               </span>
 
-              <span className="stat-icon">
+              <div className="stat-icon">
                 A
-              </span>
+              </div>
             </div>
 
             <strong className="stat-value">
@@ -427,10 +643,10 @@ export default function DashboardPage() {
               Agendamentos ativos
             </span>
           </Link>
-        </section>
+        </div>
 
-        <section className="dashboard-grid">
-          <article className="dashboard-panel">
+        <div className="dashboard-grid">
+          <section className="dashboard-panel">
             <div className="panel-header">
               <div>
                 <span className="panel-eyebrow">
@@ -438,7 +654,8 @@ export default function DashboardPage() {
                 </span>
 
                 <h2>
-                  Próximo agendamento
+                  Próximo
+                  agendamento
                 </h2>
               </div>
 
@@ -454,27 +671,15 @@ export default function DashboardPage() {
               <div className="appointment-card">
                 <div className="appointment-date">
                   <strong>
-                    {new Date(
+                    {formatarDia(
                       proximoAgendamento.dataHora,
-                    ).toLocaleDateString(
-                      "pt-BR",
-                      {
-                        day: "2-digit",
-                      },
                     )}
                   </strong>
 
                   <span>
-                    {new Date(
+                    {formatarMes(
                       proximoAgendamento.dataHora,
-                    )
-                      .toLocaleDateString(
-                        "pt-BR",
-                        {
-                          month: "short",
-                        },
-                      )
-                      .replace(".", "")}
+                    )}
                   </span>
                 </div>
 
@@ -503,22 +708,15 @@ export default function DashboardPage() {
 
                   <div className="appointment-details">
                     <span>
-                      {new Date(
+                      {formatarHorario(
                         proximoAgendamento.dataHora,
-                      ).toLocaleTimeString(
-                        "pt-BR",
-                        {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        },
                       )}
                     </span>
 
                     <span>
                       {
                         proximoAgendamento
-                          .profissional
-                          .nome
+                          .profissional.nome
                       }
                     </span>
                   </div>
@@ -531,13 +729,16 @@ export default function DashboardPage() {
                 </div>
 
                 <h3>
-                  Nenhum agendamento futuro
+                  Nenhum
+                  agendamento
+                  futuro
                 </h3>
 
                 <p>
                   Quando precisar,
-                  você pode criar um
-                  novo agendamento.
+                  você pode criar
+                  um novo
+                  agendamento.
                 </p>
 
                 <Link
@@ -548,78 +749,8 @@ export default function DashboardPage() {
                 </Link>
               </div>
             )}
-          </article>
-
-          <article className="dashboard-panel">
-            <div className="panel-header">
-              <div>
-                <span className="panel-eyebrow">
-                  Pets
-                </span>
-
-                <h2>
-                  Seus companheiros
-                </h2>
-              </div>
-
-              <Link
-                to="/pets"
-                className="panel-link"
-              >
-                Ver todos
-              </Link>
-            </div>
-
-            <div className="pets-preview">
-              {pets
-                .filter(
-                  (pet) => pet.ativo,
-                )
-                .slice(0, 3)
-                .map((pet) => (
-                  <div
-                    className="pet-preview"
-                    key={pet.id}
-                  >
-                    <div className="pet-avatar">
-                      {pet.nome
-                        .charAt(0)
-                        .toUpperCase()}
-                    </div>
-
-                    <div>
-                      <strong>
-                        {pet.nome}
-                      </strong>
-
-                      <span>
-                        {pet.especie}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-
-              {petsAtivos === 0 && (
-                <div className="empty-small">
-                  <p>
-                    Nenhum pet cadastrado.
-                  </p>
-
-                  <Link to="/pets/novo">
-                    Cadastrar pet
-                  </Link>
-                </div>
-              )}
-            </div>
-
-            <Link
-              to="/pets/novo"
-              className="secondary-button"
-            >
-              + Cadastrar novo pet
-            </Link>
-          </article>
-        </section>
+          </section>
+        </div>
       </main>
     </div>
   );

@@ -554,11 +554,7 @@
 
 .dashboard-grid {
   display: grid;
-
-  grid-template-columns:
-    minmax(0, 1.5fr)
-    minmax(300px, 0.8fr);
-
+  grid-template-columns: 1fr;
   gap: 24px;
 }
 
@@ -721,29 +717,20 @@
   align-items: center;
   gap: 12px;
 
-  padding: 12px;
+  padding: 10px 0;
 
-  border-radius: 12px;
+  border-bottom: 1px solid #eaecf0;
 
-  background: #f9fafb;
+  background: transparent;
+}
+
+.pet-preview:last-child {
+  border-bottom: none;
 }
 
 .pet-avatar {
-  width: 38px;
-  height: 38px;
-
-  display: grid;
-  place-items: center;
-
-  border-radius: 11px;
-
-  color: #1d4ed8;
-  background: #eff6ff;
-
-  font-size: 13px;
-  font-weight: 750;
+  display: none;
 }
-
 .pet-preview strong,
 .pet-preview span {
   display: block;
