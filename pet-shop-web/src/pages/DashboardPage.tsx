@@ -5,9 +5,10 @@ import {
 
 import {
   Link,
-  NavLink,
   useNavigate,
 } from "react-router";
+
+import Sidebar from "../components/Sidebar";
 
 import "./DashboardPage.css";
 
@@ -19,14 +20,9 @@ type Usuario = {
   clienteId?: number | null;
 };
 
-type AuthMeResponse =
-  | Usuario
-  | {
-      usuario: Usuario;
-    }
-  | {
-      user: Usuario;
-    };
+type AuthResponse = {
+  usuario: Usuario;
+};
 
 type Pet = {
   id: number;
@@ -75,20 +71,6 @@ async function obterMensagemErro(
   }
 }
 
-function extrairUsuario(
-  data: AuthMeResponse,
-): Usuario {
-  if ("usuario" in data) {
-    return data.usuario;
-  }
-
-  if ("user" in data) {
-    return data.user;
-  }
-
-  return data;
-}
-
 function obterIniciais(
   nome?: string | null,
 ) {
@@ -112,7 +94,9 @@ function obterIniciais(
 
   return (
     partes[0][0] +
-    partes[partes.length - 1][0]
+    partes[
+      partes.length - 1
+    ][0]
   ).toUpperCase();
 }
 
@@ -268,8 +252,8 @@ export default function DashboardPage() {
           );
         }
 
-        const usuarioResponseData =
-          (await usuarioResponse.json()) as AuthMeResponse;
+        const authData =
+          (await usuarioResponse.json()) as AuthResponse;
 
         const petsData =
           (await petsResponse.json()) as Pet[];
@@ -277,13 +261,8 @@ export default function DashboardPage() {
         const agendamentosData =
           (await agendamentosResponse.json()) as Agendamento[];
 
-        const usuarioData =
-          extrairUsuario(
-            usuarioResponseData,
-          );
-
         setUsuario(
-          usuarioData,
+          authData.usuario,
         );
 
         setPets(
@@ -312,23 +291,6 @@ export default function DashboardPage() {
 
     void carregarDashboard();
   }, [navigate]);
-
-  async function handleLogout() {
-    try {
-      await fetch(
-        "/api/auth/logout",
-        {
-          method: "POST",
-          credentials:
-            "include",
-        },
-      );
-    } finally {
-      navigate(
-        "/login",
-      );
-    }
-  }
 
   const petsAtivos =
     pets.filter(
@@ -367,35 +329,7 @@ export default function DashboardPage() {
   if (carregando) {
     return (
       <div className="dashboard-layout">
-        <aside className="dashboard-sidebar">
-          <div>
-            <div className="sidebar-brand">
-              <div className="sidebar-logo">
-                AP
-              </div>
-
-              <div>
-                <strong>
-                  Agenda Pet
-                </strong>
-
-                <span>
-                  Gestão simples
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <button
-            className="sidebar-logout"
-            type="button"
-            onClick={
-              handleLogout
-            }
-          >
-            Sair
-          </button>
-        </aside>
+        <Sidebar />
 
         <main className="dashboard-main">
           <div className="empty-state">
@@ -416,94 +350,7 @@ export default function DashboardPage() {
 
   return (
     <div className="dashboard-layout">
-      <aside className="dashboard-sidebar">
-        <div>
-          <div className="sidebar-brand">
-            <div className="sidebar-logo">
-              AP
-            </div>
-
-            <div>
-              <strong>
-                Agenda Pet
-              </strong>
-
-              <span>
-                Gestão simples
-              </span>
-            </div>
-          </div>
-
-          <nav className="sidebar-nav">
-            <NavLink
-              to="/dashboard"
-              className={({
-                isActive,
-              }) =>
-                `sidebar-link ${
-                  isActive
-                    ? "active"
-                    : ""
-                }`
-              }
-            >
-              <span className="nav-icon">
-                D
-              </span>
-
-              Dashboard
-            </NavLink>
-
-            <NavLink
-              to="/pets"
-              className={({
-                isActive,
-              }) =>
-                `sidebar-link ${
-                  isActive
-                    ? "active"
-                    : ""
-                }`
-              }
-            >
-              <span className="nav-icon">
-                P
-              </span>
-
-              Meus Pets
-            </NavLink>
-
-            <NavLink
-              to="/agendamentos"
-              className={({
-                isActive,
-              }) =>
-                `sidebar-link ${
-                  isActive
-                    ? "active"
-                    : ""
-                }`
-              }
-            >
-              <span className="nav-icon">
-                A
-              </span>
-
-              Agendamentos
-            </NavLink>
-          </nav>
-        </div>
-
-        <button
-          className="sidebar-logout"
-          type="button"
-          onClick={
-            handleLogout
-          }
-        >
-          Sair
-        </button>
-      </aside>
+      <Sidebar />
 
       <main className="dashboard-main">
         <header className="dashboard-header">
@@ -531,13 +378,15 @@ export default function DashboardPage() {
             <div className="dashboard-user">
               <div className="user-info">
                 <strong>
-                  {usuario.nome ??
-                    "Cliente"}
+                  {
+                    usuario.nome
+                  }
                 </strong>
 
                 <span>
-                  {usuario.email ??
-                    ""}
+                  {
+                    usuario.email
+                  }
                 </span>
               </div>
 
@@ -611,7 +460,9 @@ export default function DashboardPage() {
             </div>
 
             <strong className="stat-value">
-              {petsAtivos.length}
+              {
+                petsAtivos.length
+              }
             </strong>
 
             <span className="stat-footer">
@@ -654,8 +505,7 @@ export default function DashboardPage() {
                 </span>
 
                 <h2>
-                  Próximo
-                  agendamento
+                  Próximo agendamento
                 </h2>
               </div>
 

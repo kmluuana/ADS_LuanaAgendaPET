@@ -1,4 +1,12 @@
-import { useEffect, useState, type ReactNode } from "react";
+import {
+  useEffect,
+  useState,
+} from "react";
+
+import type {
+  ReactNode,
+} from "react";
+
 import {
   BrowserRouter,
   Navigate,
@@ -14,61 +22,125 @@ import LoginPage from "./pages/LoginPage";
 import NewAppointmentPage from "./pages/NewAppointmentPage";
 import NewPetPage from "./pages/NewPetPage";
 import PetsPage from "./pages/PetsPage";
+import ProfessionalsPage from "./pages/ProfessionalsPage";
+
+type PerfilUsuario =
+  | "CLIENTE"
+  | "ATENDENTE"
+  | "ADMINISTRADOR";
 
 type Usuario = {
   id: number;
   nome: string;
   email: string;
-  perfil: "CLIENTE" | "ATENDENTE" | "ADMINISTRADOR";
-  ativo: boolean;
-  clienteId: number | null;
+  perfil: PerfilUsuario;
+  clienteId?: number | null;
 };
+
+type AuthResponse =
+  | Usuario
+  | {
+      usuario: Usuario;
+    }
+  | {
+      user: Usuario;
+    };
 
 type ProtectedRouteProps = {
   children: ReactNode;
-  exigirCliente?: boolean;
+
+  perfisPermitidos?: PerfilUsuario[];
 };
+
+function extrairUsuario(
+  data: AuthResponse,
+): Usuario {
+  if ("usuario" in data) {
+    return data.usuario;
+  }
+
+  if ("user" in data) {
+    return data.user;
+  }
+
+  return data;
+}
 
 function ProtectedRoute({
   children,
-  exigirCliente = true,
+  perfisPermitidos,
 }: ProtectedRouteProps) {
-  const [carregando, setCarregando] = useState(true);
-  const [usuario, setUsuario] = useState<Usuario | null>(null);
+  const [
+    carregando,
+    setCarregando,
+  ] = useState(true);
+
+  const [
+    usuario,
+    setUsuario,
+  ] = useState<Usuario | null>(
+    null,
+  );
+
+  const [
+    autenticado,
+    setAutenticado,
+  ] = useState(false);
 
   useEffect(() => {
     async function verificarSessao() {
       try {
-        const response = await fetch(
-          "/api/auth/me",
-          {
-            credentials: "include",
-          },
-        );
+        const response =
+          await fetch(
+            "/api/auth/me",
+            {
+              credentials:
+                "include",
+            },
+          );
 
         if (!response.ok) {
-          setUsuario(null);
+          setAutenticado(
+            false,
+          );
+
           return;
         }
 
-        const data = await response.json();
+        const data =
+          (await response.json()) as AuthResponse;
 
-        setUsuario(data.usuario);
+        setUsuario(
+          extrairUsuario(
+            data,
+          ),
+        );
+
+        setAutenticado(
+          true,
+        );
       } catch {
-        setUsuario(null);
+        setAutenticado(
+          false,
+        );
       } finally {
-        setCarregando(false);
+        setCarregando(
+          false,
+        );
       }
     }
 
-    verificarSessao();
+    void verificarSessao();
   }, []);
 
   if (carregando) {
-    return <p>Carregando...</p>;
+    return null;
   }
 
-  if (!usuario) {
+  if (
+    !autenticado ||
+    !usuario
+  ) {
     return (
       <Navigate
         to="/login"
@@ -77,9 +149,18 @@ function ProtectedRoute({
     );
   }
 
+  /*
+   * Cliente precisa completar
+   * os dados antes de utilizar
+   * o sistema.
+   *
+   * Administrador e atendente
+   * não dependem de clienteId.
+   */
   if (
-    exigirCliente &&
-    usuario.clienteId === null
+    usuario.perfil ===
+      "CLIENTE" &&
+    !usuario.clienteId
   ) {
     return (
       <Navigate
@@ -90,8 +171,10 @@ function ProtectedRoute({
   }
 
   if (
-    !exigirCliente &&
-    usuario.clienteId !== null
+    perfisPermitidos &&
+    !perfisPermitidos.includes(
+      usuario.perfil,
+    )
   ) {
     return (
       <Navigate
@@ -104,7 +187,7 @@ function ProtectedRoute({
   return children;
 }
 
-function App() {
+export default function App() {
   return (
     <BrowserRouter>
       <Routes>
@@ -120,17 +203,15 @@ function App() {
 
         <Route
           path="/login"
-          element={<LoginPage />}
+          element={
+            <LoginPage />
+          }
         />
 
         <Route
           path="/complete-profile"
           element={
-            <ProtectedRoute
-              exigirCliente={false}
-            >
-              <CompleteProfilePage />
-            </ProtectedRoute>
+            <CompleteProfilePage />
           }
         />
 
@@ -189,6 +270,20 @@ function App() {
         />
 
         <Route
+          path="/admin/profissionais"
+          element={
+            <ProtectedRoute
+              perfisPermitidos={[
+                "ATENDENTE",
+                "ADMINISTRADOR",
+              ]}
+            >
+              <ProfessionalsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
           path="*"
           element={
             <Navigate
@@ -201,5 +296,3 @@ function App() {
     </BrowserRouter>
   );
 }
-
-export default App;

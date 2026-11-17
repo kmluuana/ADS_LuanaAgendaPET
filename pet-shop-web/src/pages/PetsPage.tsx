@@ -3,10 +3,12 @@ import {
   useMemo,
   useState,
 } from "react";
+
 import {
   Link,
-  useNavigate,
 } from "react-router";
+
+import Sidebar from "../components/Sidebar";
 
 import "./DashboardPage.css";
 import "./PetsPage.css";
@@ -25,8 +27,6 @@ type FiltroPet =
   | "INATIVOS";
 
 export default function PetsPage() {
-  const navigate = useNavigate();
-
   const [pets, setPets] =
     useState<Pet[]>([]);
 
@@ -70,7 +70,7 @@ export default function PetsPage() {
   }
 
   useEffect(() => {
-    carregarPets();
+    void carregarPets();
   }, []);
 
   const petsFiltrados = useMemo(
@@ -121,10 +121,12 @@ export default function PetsPage() {
         {
           method: "PATCH",
           credentials: "include",
+
           headers: {
             "Content-Type":
               "application/json",
           },
+
           body: JSON.stringify({
             ativo: !pet.ativo,
           }),
@@ -151,22 +153,6 @@ export default function PetsPage() {
     }
   }
 
-  async function sair() {
-    try {
-      await fetch(
-        "/api/auth/logout",
-        {
-          method: "POST",
-          credentials: "include",
-        },
-      );
-    } finally {
-      navigate("/login", {
-        replace: true,
-      });
-    }
-  }
-
   function obterInicial(
     nome: string,
   ) {
@@ -189,68 +175,7 @@ export default function PetsPage() {
 
   return (
     <div className="dashboard-layout">
-      <aside className="dashboard-sidebar">
-        <div>
-          <div className="sidebar-brand">
-            <div className="sidebar-logo">
-              AP
-            </div>
-
-            <div>
-              <strong>
-                Agenda Pet
-              </strong>
-
-              <span>
-                Gestão simples
-              </span>
-            </div>
-          </div>
-
-          <nav className="sidebar-nav">
-            <Link
-              to="/dashboard"
-              className="sidebar-link"
-            >
-              <span className="nav-icon">
-                D
-              </span>
-
-              Dashboard
-            </Link>
-
-            <Link
-              to="/pets"
-              className="sidebar-link active"
-            >
-              <span className="nav-icon">
-                P
-              </span>
-
-              Meus Pets
-            </Link>
-
-            <Link
-              to="/agendamentos"
-              className="sidebar-link"
-            >
-              <span className="nav-icon">
-                A
-              </span>
-
-              Agendamentos
-            </Link>
-          </nav>
-        </div>
-
-        <button
-          type="button"
-          className="sidebar-logout"
-          onClick={sair}
-        >
-          Sair
-        </button>
-      </aside>
+      <Sidebar />
 
       <main className="pets-page">
         <header className="pets-header">
@@ -259,7 +184,9 @@ export default function PetsPage() {
               Seus companheiros
             </span>
 
-            <h1>Meus Pets</h1>
+            <h1>
+              Meus Pets
+            </h1>
 
             <p>
               Gerencie os pets vinculados
@@ -271,7 +198,10 @@ export default function PetsPage() {
             to="/pets/novo"
             className="pets-primary-button"
           >
-            <span>+</span>
+            <span>
+              +
+            </span>
+
             Novo pet
           </Link>
         </header>
@@ -474,7 +404,7 @@ export default function PetsPage() {
                             : "pet-status-button success"
                         }
                         onClick={() =>
-                          alterarStatus(
+                          void alterarStatus(
                             pet,
                           )
                         }

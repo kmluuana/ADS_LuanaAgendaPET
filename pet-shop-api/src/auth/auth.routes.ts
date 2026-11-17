@@ -10,106 +10,194 @@ import { gerarTokenUsuario } from "./token.service";
 
 const router = Router();
 
-router.post("/google", async (request, response) => {
-  try {
-    const { idToken } = request.body;
-
-    const usuario = await autenticarComGoogle(idToken);
-
-    const token = await gerarTokenUsuario({
-      id: usuario.id,
-      perfil: usuario.perfil,
-    });
-
-    response.cookie("agenda_pet_session", token, {
-      httpOnly: true,
-      secure: false,
-      sameSite: "lax",
-      maxAge: 8 * 60 * 60 * 1000,
-    });
-
-    response.json({
-      usuario,
-    });
-  } catch (error) {
-    if (error instanceof Error) {
-      response.status(401).json({
-        message: error.message,
-      });
-
-      return;
-    }
-
-    response.status(500).json({
-      message: "Erro interno ao autenticar usuário",
-    });
-  }
-});
-
-router.get("/me", exigirAutenticacao, async (_request, response) => {
-  try {
-    const { id } = response.locals.auth;
-
-    const usuario = await obterUsuarioPorId(id);
-
-    if (!usuario || !usuario.ativo) {
-      response.status(401).json({
-        message: "Usuário não encontrado ou inativo",
-      });
-
-      return;
-    }
-
-    response.json({
-      usuario,
-    });
-  } catch {
-    response.status(500).json({
-      message: "Erro interno ao consultar usuário",
-    });
-  }
-});
-
 router.post(
-  "/complete-profile",
-  exigirAutenticacao,
+  "/google",
   async (request, response) => {
     try {
-      const { id } = response.locals.auth;
-      const { telefone } = request.body;
+      const { idToken } =
+        request.body;
 
-      const cliente = await completarCadastroCliente(
-        id,
-        telefone,
+      const usuario =
+        await autenticarComGoogle(
+          idToken,
+        );
+
+      const token =
+        await gerarTokenUsuario({
+          id: usuario.id,
+          perfil:
+            usuario.perfil,
+        });
+
+      response.cookie(
+        "agenda_pet_session",
+        token,
+        {
+          httpOnly: true,
+          secure: false,
+          sameSite: "lax",
+          maxAge:
+            8 *
+            60 *
+            60 *
+            1000,
+        },
       );
 
-      response.status(200).json({
-        cliente,
+      response.json({
+        usuario,
       });
     } catch (error) {
-      if (error instanceof Error) {
-        response.status(400).json({
-          message: error.message,
-        });
+      console.error(
+        "[AUTH-GOOGLE] Erro ao autenticar:",
+        error,
+      );
+
+      if (
+        error instanceof Error
+      ) {
+        response
+          .status(401)
+          .json({
+            message:
+              error.message,
+          });
 
         return;
       }
 
-      response.status(500).json({
-        message: "Erro interno ao completar cadastro",
-      });
+      response
+        .status(500)
+        .json({
+          message:
+            "Erro interno ao autenticar usuário",
+        });
     }
   },
 );
 
-router.post("/logout", (_request, response) => {
-  response.clearCookie("agenda_pet_session", {
-    httpOnly: true,
-    secure: false,
-    sameSite: "lax",
-  });
+router.get(
+  "/me",
+  exigirAutenticacao,
+  async (
+    _request,
+    response,
+  ) => {
+    try {
+      const { id } =
+        response.locals.auth;
 
-  response.status(204).send();
-});
+      const usuario =
+        await obterUsuarioPorId(
+          id,
+        );
+
+      if (
+        !usuario ||
+        !usuario.ativo
+      ) {
+        response
+          .status(401)
+          .json({
+            message:
+              "Usuário não encontrado ou inativo",
+          });
+
+        return;
+      }
+
+      response.json({
+        usuario,
+      });
+    } catch (error) {
+      console.error(
+        "[AUTH-ME] Erro ao consultar usuário:",
+        error,
+      );
+
+      response
+        .status(500)
+        .json({
+          message:
+            "Erro interno ao consultar usuário",
+        });
+    }
+  },
+);
+
+router.post(
+  "/complete-profile",
+  exigirAutenticacao,
+  async (
+    request,
+    response,
+  ) => {
+    try {
+      const { id } =
+        response.locals.auth;
+
+      const { telefone } =
+        request.body;
+
+      const cliente =
+        await completarCadastroCliente(
+          id,
+          telefone,
+        );
+
+      response
+        .status(200)
+        .json({
+          cliente,
+        });
+    } catch (error) {
+      console.error(
+        "[AUTH-COMPLETE-PROFILE] Erro:",
+        error,
+      );
+
+      if (
+        error instanceof Error
+      ) {
+        response
+          .status(400)
+          .json({
+            message:
+              error.message,
+          });
+
+        return;
+      }
+
+      response
+        .status(500)
+        .json({
+          message:
+            "Erro interno ao completar cadastro",
+        });
+    }
+  },
+);
+
+router.post(
+  "/logout",
+  (
+    _request,
+    response,
+  ) => {
+    response.clearCookie(
+      "agenda_pet_session",
+      {
+        httpOnly: true,
+        secure: false,
+        sameSite: "lax",
+      },
+    );
+
+    response
+      .status(204)
+      .send();
+  },
+);
 
 export default router;

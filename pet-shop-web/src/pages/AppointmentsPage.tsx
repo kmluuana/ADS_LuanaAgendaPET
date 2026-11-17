@@ -3,10 +3,12 @@ import {
   useMemo,
   useState,
 } from "react";
+
 import {
   Link,
-  useNavigate,
 } from "react-router";
+
+import Sidebar from "../components/Sidebar";
 
 import "./DashboardPage.css";
 import "./AppointmentsPage.css";
@@ -44,8 +46,6 @@ type Appointment = {
 };
 
 export default function AppointmentsPage() {
-  const navigate = useNavigate();
-
   const [
     agendamentos,
     setAgendamentos,
@@ -93,7 +93,7 @@ export default function AppointmentsPage() {
   }
 
   useEffect(() => {
-    carregarAgendamentos();
+    void carregarAgendamentos();
   }, []);
 
   const agendamentosFiltrados =
@@ -101,7 +101,9 @@ export default function AppointmentsPage() {
       () =>
         agendamentos.filter(
           (agendamento) => {
-            if (filtro === "TODOS") {
+            if (
+              filtro === "TODOS"
+            ) {
               return true;
             }
 
@@ -197,22 +199,6 @@ export default function AppointmentsPage() {
     }
   }
 
-  async function sair() {
-    try {
-      await fetch(
-        "/api/auth/logout",
-        {
-          method: "POST",
-          credentials: "include",
-        },
-      );
-    } finally {
-      navigate("/login", {
-        replace: true,
-      });
-    }
-  }
-
   function formatarData(
     dataHora: string,
   ) {
@@ -284,68 +270,7 @@ export default function AppointmentsPage() {
 
   return (
     <div className="dashboard-layout">
-      <aside className="dashboard-sidebar">
-        <div>
-          <div className="sidebar-brand">
-            <div className="sidebar-logo">
-              AP
-            </div>
-
-            <div>
-              <strong>
-                Agenda Pet
-              </strong>
-
-              <span>
-                Gestão simples
-              </span>
-            </div>
-          </div>
-
-          <nav className="sidebar-nav">
-            <Link
-              to="/dashboard"
-              className="sidebar-link"
-            >
-              <span className="nav-icon">
-                D
-              </span>
-
-              Dashboard
-            </Link>
-
-            <Link
-              to="/pets"
-              className="sidebar-link"
-            >
-              <span className="nav-icon">
-                P
-              </span>
-
-              Meus Pets
-            </Link>
-
-            <Link
-              to="/agendamentos"
-              className="sidebar-link active"
-            >
-              <span className="nav-icon">
-                A
-              </span>
-
-              Agendamentos
-            </Link>
-          </nav>
-        </div>
-
-        <button
-          type="button"
-          className="sidebar-logout"
-          onClick={sair}
-        >
-          Sair
-        </button>
-      </aside>
+      <Sidebar />
 
       <main className="appointments-page">
         <header className="appointments-header">
@@ -369,7 +294,10 @@ export default function AppointmentsPage() {
             to="/agendamentos/novo"
             className="appointments-primary-button"
           >
-            <span>+</span>
+            <span>
+              +
+            </span>
+
             Novo agendamento
           </Link>
         </header>
@@ -443,7 +371,8 @@ export default function AppointmentsPage() {
               <button
                 type="button"
                 className={
-                  filtro === "AGENDADO"
+                  filtro ===
+                  "AGENDADO"
                     ? "appointment-filter active"
                     : "appointment-filter"
                 }
@@ -459,7 +388,8 @@ export default function AppointmentsPage() {
               <button
                 type="button"
                 className={
-                  filtro === "CONCLUIDO"
+                  filtro ===
+                  "CONCLUIDO"
                     ? "appointment-filter active"
                     : "appointment-filter"
                 }
@@ -475,7 +405,8 @@ export default function AppointmentsPage() {
               <button
                 type="button"
                 className={
-                  filtro === "CANCELADO"
+                  filtro ===
+                  "CANCELADO"
                     ? "appointment-filter active"
                     : "appointment-filter"
                 }
@@ -660,7 +591,7 @@ export default function AppointmentsPage() {
                           type="button"
                           className="appointment-cancel-button"
                           onClick={() =>
-                            cancelarAgendamento(
+                            void cancelarAgendamento(
                               agendamento.id,
                             )
                           }

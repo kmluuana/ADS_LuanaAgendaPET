@@ -10,9 +10,10 @@ import type {
 
 import {
   Link,
-  NavLink,
   useNavigate,
 } from "react-router";
+
+import Sidebar from "../components/Sidebar";
 
 import "./DashboardPage.css";
 import "./AppointmentFormPage.css";
@@ -94,11 +95,11 @@ async function obterMensagemErro(
 }
 
 export default function NewAppointmentPage() {
-  const navigate = useNavigate();
+  const navigate =
+    useNavigate();
 
-  const [pets, setPets] = useState<
-    Pet[]
-  >([]);
+  const [pets, setPets] =
+    useState<Pet[]>([]);
 
   const [servicos, setServicos] =
     useState<Servico[]>([]);
@@ -165,13 +166,21 @@ export default function NewAppointmentPage() {
           petsResponse,
           servicosResponse,
         ] = await Promise.all([
-          fetch("/api/pets", {
-            credentials: "include",
-          }),
+          fetch(
+            "/api/pets",
+            {
+              credentials:
+                "include",
+            },
+          ),
 
-          fetch("/api/servicos", {
-            credentials: "include",
-          }),
+          fetch(
+            "/api/servicos",
+            {
+              credentials:
+                "include",
+            },
+          ),
         ]);
 
         if (!petsResponse.ok) {
@@ -200,7 +209,8 @@ export default function NewAppointmentPage() {
 
         const petsAtivos =
           petsData.filter(
-            (pet) => pet.ativo,
+            (pet) =>
+              pet.ativo,
           );
 
         const servicosAtivos =
@@ -420,28 +430,29 @@ export default function NewAppointmentPage() {
                 "application/json",
             },
 
-            body: JSON.stringify({
-              petId:
-                Number(petId),
+            body:
+              JSON.stringify({
+                petId:
+                  Number(petId),
 
-              servicoId:
-                Number(
-                  servicoId,
-                ),
+                servicoId:
+                  Number(
+                    servicoId,
+                  ),
 
-              profissionalId:
-                Number(
-                  profissionalId,
-                ),
+                profissionalId:
+                  Number(
+                    profissionalId,
+                  ),
 
-              dataHora:
-                dataSelecionada.toISOString(),
+                dataHora:
+                  dataSelecionada.toISOString(),
 
-              observacoes:
-                observacoes.trim()
-                  ? observacoes.trim()
-                  : undefined,
-            }),
+                observacoes:
+                  observacoes.trim()
+                    ? observacoes.trim()
+                    : undefined,
+              }),
           },
         );
 
@@ -474,55 +485,10 @@ export default function NewAppointmentPage() {
     }
   }
 
-  async function handleLogout() {
-    try {
-      await fetch(
-        "/api/auth/logout",
-        {
-          method: "POST",
-          credentials:
-            "include",
-        },
-      );
-    } finally {
-      navigate(
-        "/login",
-      );
-    }
-  }
-
   if (carregando) {
     return (
       <div className="dashboard-layout">
-        <aside className="dashboard-sidebar">
-          <div>
-            <div className="sidebar-brand">
-              <div className="sidebar-logo">
-                AP
-              </div>
-
-              <div>
-                <strong>
-                  Agenda Pet
-                </strong>
-
-                <span>
-                  Gestão simples
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <button
-            className="sidebar-logout"
-            type="button"
-            onClick={
-              handleLogout
-            }
-          >
-            Sair
-          </button>
-        </aside>
+        <Sidebar />
 
         <main className="dashboard-main">
           <div className="empty-state">
@@ -543,88 +509,7 @@ export default function NewAppointmentPage() {
 
   return (
     <div className="dashboard-layout">
-      <aside className="dashboard-sidebar">
-        <div>
-          <div className="sidebar-brand">
-            <div className="sidebar-logo">
-              AP
-            </div>
-
-            <div>
-              <strong>
-                Agenda Pet
-              </strong>
-
-              <span>
-                Gestão simples
-              </span>
-            </div>
-          </div>
-
-          <nav className="sidebar-nav">
-            <NavLink
-              to="/dashboard"
-              className={({
-                isActive,
-              }) =>
-                `sidebar-link ${
-                  isActive
-                    ? "active"
-                    : ""
-                }`
-              }
-            >
-              <span className="nav-icon">
-                D
-              </span>
-
-              Dashboard
-            </NavLink>
-
-            <NavLink
-              to="/pets"
-              className={({
-                isActive,
-              }) =>
-                `sidebar-link ${
-                  isActive
-                    ? "active"
-                    : ""
-                }`
-              }
-            >
-              <span className="nav-icon">
-                P
-              </span>
-
-              Meus Pets
-            </NavLink>
-
-            <NavLink
-              to="/agendamentos"
-              className={() =>
-                "sidebar-link active"
-              }
-            >
-              <span className="nav-icon">
-                A
-              </span>
-
-              Agendamentos
-            </NavLink>
-          </nav>
-        </div>
-
-        <button
-          className="sidebar-logout"
-          type="button"
-          onClick={
-            handleLogout
-          }
-        >
-          Sair
-        </button>
-      </aside>
+      <Sidebar />
 
       <main className="dashboard-main">
         <header className="appointment-page-header">
@@ -739,8 +624,7 @@ export default function NewAppointmentPage() {
                         required
                       >
                         <option value="">
-                          Selecione
-                          um pet
+                          Selecione um pet
                         </option>
 
                         {pets.map(
@@ -794,8 +678,7 @@ export default function NewAppointmentPage() {
                           required
                         >
                           <option value="">
-                            Selecione
-                            um serviço
+                            Selecione um serviço
                           </option>
 
                           {servicos.map(
@@ -848,9 +731,7 @@ export default function NewAppointmentPage() {
                         >
                           {!servicoId && (
                             <option value="">
-                              Escolha
-                              primeiro
-                              um serviço
+                              Escolha primeiro um serviço
                             </option>
                           )}
 
@@ -866,9 +747,7 @@ export default function NewAppointmentPage() {
                             profissionais.length ===
                               0 && (
                               <option value="">
-                                Nenhum
-                                profissional
-                                disponível
+                                Nenhum profissional disponível
                               </option>
                             )}
 
@@ -877,9 +756,7 @@ export default function NewAppointmentPage() {
                             profissionais.length >
                               0 && (
                               <option value="">
-                                Selecione
-                                um
-                                profissional
+                                Selecione um profissional
                               </option>
                             )}
 

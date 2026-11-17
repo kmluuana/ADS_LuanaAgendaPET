@@ -1,7 +1,13 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router";
 
-export default function CompleteProfilePage() {
+type CompleteProfilePageProps = {
+  onComplete?: (clienteId: number) => void;
+};
+
+export default function CompleteProfilePage({
+  onComplete,
+}: CompleteProfilePageProps) {
   const navigate = useNavigate();
 
   const [telefone, setTelefone] = useState("");
@@ -30,6 +36,11 @@ export default function CompleteProfilePage() {
 
       if (!response.ok) {
         setErro(data.message ?? "Não foi possível completar o cadastro");
+        return;
+      }
+
+      if (onComplete) {
+        onComplete(data.cliente.id);
         return;
       }
 
