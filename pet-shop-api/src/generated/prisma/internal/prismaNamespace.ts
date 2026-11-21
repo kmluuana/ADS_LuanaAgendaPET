@@ -1051,6 +1051,7 @@ export const AgendamentoScalarFieldEnum = {
   observacoes: 'observacoes',
   lembrete24hEnviadoEm: 'lembrete24hEnviadoEm',
   lembrete24hUltimoErro: 'lembrete24hUltimoErro',
+  lembrete24hProcessandoEm: 'lembrete24hProcessandoEm',
   petId: 'petId',
   servicoId: 'servicoId',
   profissionalId: 'profissionalId',

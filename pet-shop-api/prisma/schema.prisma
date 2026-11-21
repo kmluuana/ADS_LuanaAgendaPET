@@ -1,3 +1,4 @@
+
 generator client {
   provider            = "prisma-client"
   output              = "../src/generated/prisma"
@@ -95,8 +96,10 @@ model Agendamento {
   status      StatusAgendamento @default(AGENDADO)
   observacoes String?
 
-  lembrete24hEnviadoEm DateTime?
-  lembrete24hUltimoErro String?
+  // Controle dos lembretes enviados pelo WhatsApp
+  lembrete24hEnviadoEm     DateTime?
+  lembrete24hUltimoErro    String?
+  lembrete24hProcessandoEm DateTime?
 
   petId          Int
   servicoId      Int

@@ -1,3 +1,4 @@
+
 import { db } from "../prisma/db";
 
 export async function listarAgendamentos() {
@@ -94,10 +95,7 @@ export async function atualizarAgendamento(
 
 export async function atualizarStatusAgendamento(
   id: number,
-  status:
-    | "AGENDADO"
-    | "CONCLUIDO"
-    | "CANCELADO",
+  status: "AGENDADO" | "CONCLUIDO" | "CANCELADO",
 ) {
   return db.agendamento.update({
     where: {
@@ -127,11 +125,10 @@ export async function listarAgendamentosAtivosDoProfissional(
 }
 
 /**
- * Busca os agendamentos que devem
- * receber o lembrete de 24 horas.
+ * Consulta agendamentos elegíveis para lembrete.
  *
- * A janela de horário é recebida
- * pelo service.
+ * Apenas agendamentos não enviados e
+ * não reservados são retornados.
  */
 export async function listarLembretes24hPendentes(
   inicio: Date,
@@ -140,27 +137,22 @@ export async function listarLembretes24hPendentes(
   return db.agendamento.findMany({
     where: {
       status: "AGENDADO",
-
       lembrete24hEnviadoEm: null,
-
+      lembrete24hProcessandoEm: null,
       dataHora: {
         gte: inicio,
         lt: fim,
       },
     },
-
     include: {
       pet: {
         include: {
           cliente: true,
         },
       },
-
       servico: true,
-
       profissional: true,
     },
-
     orderBy: {
       dataHora: "asc",
     },
@@ -168,7 +160,86 @@ export async function listarLembretes24hPendentes(
 }
 
 /**
- * Marca o lembrete como enviado.
+ * Tenta reservar atomicamente um agendamento.
+ *
+ * Retorna a data da reserva quando consegue
+ * reservar e null caso contrário.
+ */
+export async function reservarLembrete24h(
+  agendamentoId: number,
+): Promise<Date | null> {
+  const reservadoEm = new Date();
+
+  const resultado = await db.agendamento.updateMany({
+    where: {
+      id: agendamentoId,
+      status: "AGENDADO",
+      lembrete24hEnviadoEm: null,
+      lembrete24hProcessandoEm: null,
+    },
+    data: {
+      lembrete24hProcessandoEm: reservadoEm,
+    },
+  });
+
+  return resultado.count === 1 ? reservadoEm : null;
+}
+
+/**
+ * Conclui um lembrete reservado.
+ *
+ * A data da reserva identifica qual execução
+ * possui o direito de finalizar o processamento.
+ */
+export async function concluirLembrete24hReservado(
+  agendamentoId: number,
+  reservadoEm: Date,
+) {
+  const resultado = await db.agendamento.updateMany({
+    where: {
+      id: agendamentoId,
+      lembrete24hProcessandoEm: reservadoEm,
+      lembrete24hEnviadoEm: null,
+    },
+    data: {
+      lembrete24hEnviadoEm: new Date(),
+      lembrete24hUltimoErro: null,
+      lembrete24hProcessandoEm: null,
+    },
+  });
+
+  return resultado.count === 1;
+}
+
+/**
+ * Registra erro e libera a reserva,
+ * desde que ela pertença à mesma execução.
+ */
+export async function registrarErroLembrete24hReservado(
+  agendamentoId: number,
+  reservadoEm: Date,
+  erro: string,
+) {
+  const resultado = await db.agendamento.updateMany({
+    where: {
+      id: agendamentoId,
+      lembrete24hProcessandoEm: reservadoEm,
+      lembrete24hEnviadoEm: null,
+    },
+    data: {
+      lembrete24hUltimoErro: erro,
+      lembrete24hProcessandoEm: null,
+    },
+  });
+
+  return resultado.count === 1;
+}
+
+/**
+ * Métodos originais mantidos temporariamente
+ * para preservar a compatibilidade com o service.
+ *
+ * Serão substituídos no próximo passo.
  */
 export async function marcarLembrete24hEnviado(
   agendamentoId: number,
@@ -177,21 +248,13 @@ export async function marcarLembrete24hEnviado(
     where: {
       id: agendamentoId,
     },
-
     data: {
-      lembrete24hEnviadoEm:
-        new Date(),
-
-      lembrete24hUltimoErro:
-        null,
+      lembrete24hEnviadoEm: new Date(),
+      lembrete24hUltimoErro: null,
     },
   });
 }
 
-/**
- * Guarda o último erro ocorrido
- * ao tentar enviar o lembrete.
- */
 export async function registrarErroLembrete24h(
   agendamentoId: number,
   erro: string,
@@ -200,10 +263,8 @@ export async function registrarErroLembrete24h(
     where: {
       id: agendamentoId,
     },
-
     data: {
-      lembrete24hUltimoErro:
-        erro,
+      lembrete24hUltimoErro: erro,
     },
   });
 }

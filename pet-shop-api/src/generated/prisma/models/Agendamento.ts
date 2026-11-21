@@ -47,6 +47,7 @@ export type AgendamentoMinAggregateOutputType = {
   observacoes: string | null
   lembrete24hEnviadoEm: Date | null
   lembrete24hUltimoErro: string | null
+  lembrete24hProcessandoEm: Date | null
   petId: number | null
   servicoId: number | null
   profissionalId: number | null
@@ -61,6 +62,7 @@ export type AgendamentoMaxAggregateOutputType = {
   observacoes: string | null
   lembrete24hEnviadoEm: Date | null
   lembrete24hUltimoErro: string | null
+  lembrete24hProcessandoEm: Date | null
   petId: number | null
   servicoId: number | null
   profissionalId: number | null
@@ -75,6 +77,7 @@ export type AgendamentoCountAggregateOutputType = {
   observacoes: number
   lembrete24hEnviadoEm: number
   lembrete24hUltimoErro: number
+  lembrete24hProcessandoEm: number
   petId: number
   servicoId: number
   profissionalId: number
@@ -105,6 +108,7 @@ export type AgendamentoMinAggregateInputType = {
   observacoes?: true
   lembrete24hEnviadoEm?: true
   lembrete24hUltimoErro?: true
+  lembrete24hProcessandoEm?: true
   petId?: true
   servicoId?: true
   profissionalId?: true
@@ -119,6 +123,7 @@ export type AgendamentoMaxAggregateInputType = {
   observacoes?: true
   lembrete24hEnviadoEm?: true
   lembrete24hUltimoErro?: true
+  lembrete24hProcessandoEm?: true
   petId?: true
   servicoId?: true
   profissionalId?: true
@@ -133,6 +138,7 @@ export type AgendamentoCountAggregateInputType = {
   observacoes?: true
   lembrete24hEnviadoEm?: true
   lembrete24hUltimoErro?: true
+  lembrete24hProcessandoEm?: true
   petId?: true
   servicoId?: true
   profissionalId?: true
@@ -234,6 +240,7 @@ export type AgendamentoGroupByOutputType = {
   observacoes: string | null
   lembrete24hEnviadoEm: Date | null
   lembrete24hUltimoErro: string | null
+  lembrete24hProcessandoEm: Date | null
   petId: number
   servicoId: number
   profissionalId: number
@@ -271,6 +278,7 @@ export type AgendamentoWhereInput = {
   observacoes?: Prisma.StringNullableFilter<"Agendamento"> | string | null
   lembrete24hEnviadoEm?: Prisma.DateTimeNullableFilter<"Agendamento"> | Date | string | null
   lembrete24hUltimoErro?: Prisma.StringNullableFilter<"Agendamento"> | string | null
+  lembrete24hProcessandoEm?: Prisma.DateTimeNullableFilter<"Agendamento"> | Date | string | null
   petId?: Prisma.IntFilter<"Agendamento"> | number
   servicoId?: Prisma.IntFilter<"Agendamento"> | number
   profissionalId?: Prisma.IntFilter<"Agendamento"> | number
@@ -288,6 +296,7 @@ export type AgendamentoOrderByWithRelationInput = {
   observacoes?: Prisma.SortOrderInput | Prisma.SortOrder
   lembrete24hEnviadoEm?: Prisma.SortOrderInput | Prisma.SortOrder
   lembrete24hUltimoErro?: Prisma.SortOrderInput | Prisma.SortOrder
+  lembrete24hProcessandoEm?: Prisma.SortOrderInput | Prisma.SortOrder
   petId?: Prisma.SortOrder
   servicoId?: Prisma.SortOrder
   profissionalId?: Prisma.SortOrder
@@ -308,6 +317,7 @@ export type AgendamentoWhereUniqueInput = Prisma.AtLeast<{
   observacoes?: Prisma.StringNullableFilter<"Agendamento"> | string | null
   lembrete24hEnviadoEm?: Prisma.DateTimeNullableFilter<"Agendamento"> | Date | string | null
   lembrete24hUltimoErro?: Prisma.StringNullableFilter<"Agendamento"> | string | null
+  lembrete24hProcessandoEm?: Prisma.DateTimeNullableFilter<"Agendamento"> | Date | string | null
   petId?: Prisma.IntFilter<"Agendamento"> | number
   servicoId?: Prisma.IntFilter<"Agendamento"> | number
   profissionalId?: Prisma.IntFilter<"Agendamento"> | number
@@ -325,6 +335,7 @@ export type AgendamentoOrderByWithAggregationInput = {
   observacoes?: Prisma.SortOrderInput | Prisma.SortOrder
   lembrete24hEnviadoEm?: Prisma.SortOrderInput | Prisma.SortOrder
   lembrete24hUltimoErro?: Prisma.SortOrderInput | Prisma.SortOrder
+  lembrete24hProcessandoEm?: Prisma.SortOrderInput | Prisma.SortOrder
   petId?: Prisma.SortOrder
   servicoId?: Prisma.SortOrder
   profissionalId?: Prisma.SortOrder
@@ -347,6 +358,7 @@ export type AgendamentoScalarWhereWithAggregatesInput = {
   observacoes?: Prisma.StringNullableWithAggregatesFilter<"Agendamento"> | string | null
   lembrete24hEnviadoEm?: Prisma.DateTimeNullableWithAggregatesFilter<"Agendamento"> | Date | string | null
   lembrete24hUltimoErro?: Prisma.StringNullableWithAggregatesFilter<"Agendamento"> | string | null
+  lembrete24hProcessandoEm?: Prisma.DateTimeNullableWithAggregatesFilter<"Agendamento"> | Date | string | null
   petId?: Prisma.IntWithAggregatesFilter<"Agendamento"> | number
   servicoId?: Prisma.IntWithAggregatesFilter<"Agendamento"> | number
   profissionalId?: Prisma.IntWithAggregatesFilter<"Agendamento"> | number
@@ -360,6 +372,7 @@ export type AgendamentoCreateInput = {
   observacoes?: string | null
   lembrete24hEnviadoEm?: Date | string | null
   lembrete24hUltimoErro?: string | null
+  lembrete24hProcessandoEm?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   pet: Prisma.PetCreateNestedOneWithoutAgendamentosInput
@@ -374,6 +387,7 @@ export type AgendamentoUncheckedCreateInput = {
   observacoes?: string | null
   lembrete24hEnviadoEm?: Date | string | null
   lembrete24hUltimoErro?: string | null
+  lembrete24hProcessandoEm?: Date | string | null
   petId: number
   servicoId: number
   profissionalId: number
@@ -387,6 +401,7 @@ export type AgendamentoUpdateInput = {
   observacoes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lembrete24hEnviadoEm?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lembrete24hUltimoErro?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lembrete24hProcessandoEm?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pet?: Prisma.PetUpdateOneRequiredWithoutAgendamentosNestedInput
@@ -401,6 +416,7 @@ export type AgendamentoUncheckedUpdateInput = {
   observacoes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lembrete24hEnviadoEm?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lembrete24hUltimoErro?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lembrete24hProcessandoEm?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   petId?: Prisma.IntFieldUpdateOperationsInput | number
   servicoId?: Prisma.IntFieldUpdateOperationsInput | number
   profissionalId?: Prisma.IntFieldUpdateOperationsInput | number
@@ -415,6 +431,7 @@ export type AgendamentoCreateManyInput = {
   observacoes?: string | null
   lembrete24hEnviadoEm?: Date | string | null
   lembrete24hUltimoErro?: string | null
+  lembrete24hProcessandoEm?: Date | string | null
   petId: number
   servicoId: number
   profissionalId: number
@@ -428,6 +445,7 @@ export type AgendamentoUpdateManyMutationInput = {
   observacoes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lembrete24hEnviadoEm?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lembrete24hUltimoErro?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lembrete24hProcessandoEm?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -439,6 +457,7 @@ export type AgendamentoUncheckedUpdateManyInput = {
   observacoes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lembrete24hEnviadoEm?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lembrete24hUltimoErro?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lembrete24hProcessandoEm?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   petId?: Prisma.IntFieldUpdateOperationsInput | number
   servicoId?: Prisma.IntFieldUpdateOperationsInput | number
   profissionalId?: Prisma.IntFieldUpdateOperationsInput | number
@@ -463,6 +482,7 @@ export type AgendamentoCountOrderByAggregateInput = {
   observacoes?: Prisma.SortOrder
   lembrete24hEnviadoEm?: Prisma.SortOrder
   lembrete24hUltimoErro?: Prisma.SortOrder
+  lembrete24hProcessandoEm?: Prisma.SortOrder
   petId?: Prisma.SortOrder
   servicoId?: Prisma.SortOrder
   profissionalId?: Prisma.SortOrder
@@ -484,6 +504,7 @@ export type AgendamentoMaxOrderByAggregateInput = {
   observacoes?: Prisma.SortOrder
   lembrete24hEnviadoEm?: Prisma.SortOrder
   lembrete24hUltimoErro?: Prisma.SortOrder
+  lembrete24hProcessandoEm?: Prisma.SortOrder
   petId?: Prisma.SortOrder
   servicoId?: Prisma.SortOrder
   profissionalId?: Prisma.SortOrder
@@ -498,6 +519,7 @@ export type AgendamentoMinOrderByAggregateInput = {
   observacoes?: Prisma.SortOrder
   lembrete24hEnviadoEm?: Prisma.SortOrder
   lembrete24hUltimoErro?: Prisma.SortOrder
+  lembrete24hProcessandoEm?: Prisma.SortOrder
   petId?: Prisma.SortOrder
   servicoId?: Prisma.SortOrder
   profissionalId?: Prisma.SortOrder
@@ -648,6 +670,7 @@ export type AgendamentoCreateWithoutServicoInput = {
   observacoes?: string | null
   lembrete24hEnviadoEm?: Date | string | null
   lembrete24hUltimoErro?: string | null
+  lembrete24hProcessandoEm?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   pet: Prisma.PetCreateNestedOneWithoutAgendamentosInput
@@ -661,6 +684,7 @@ export type AgendamentoUncheckedCreateWithoutServicoInput = {
   observacoes?: string | null
   lembrete24hEnviadoEm?: Date | string | null
   lembrete24hUltimoErro?: string | null
+  lembrete24hProcessandoEm?: Date | string | null
   petId: number
   profissionalId: number
   createdAt?: Date | string
@@ -703,6 +727,7 @@ export type AgendamentoScalarWhereInput = {
   observacoes?: Prisma.StringNullableFilter<"Agendamento"> | string | null
   lembrete24hEnviadoEm?: Prisma.DateTimeNullableFilter<"Agendamento"> | Date | string | null
   lembrete24hUltimoErro?: Prisma.StringNullableFilter<"Agendamento"> | string | null
+  lembrete24hProcessandoEm?: Prisma.DateTimeNullableFilter<"Agendamento"> | Date | string | null
   petId?: Prisma.IntFilter<"Agendamento"> | number
   servicoId?: Prisma.IntFilter<"Agendamento"> | number
   profissionalId?: Prisma.IntFilter<"Agendamento"> | number
@@ -716,6 +741,7 @@ export type AgendamentoCreateWithoutPetInput = {
   observacoes?: string | null
   lembrete24hEnviadoEm?: Date | string | null
   lembrete24hUltimoErro?: string | null
+  lembrete24hProcessandoEm?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   servico: Prisma.ServicoCreateNestedOneWithoutAgendamentosInput
@@ -729,6 +755,7 @@ export type AgendamentoUncheckedCreateWithoutPetInput = {
   observacoes?: string | null
   lembrete24hEnviadoEm?: Date | string | null
   lembrete24hUltimoErro?: string | null
+  lembrete24hProcessandoEm?: Date | string | null
   servicoId: number
   profissionalId: number
   createdAt?: Date | string
@@ -767,6 +794,7 @@ export type AgendamentoCreateWithoutProfissionalInput = {
   observacoes?: string | null
   lembrete24hEnviadoEm?: Date | string | null
   lembrete24hUltimoErro?: string | null
+  lembrete24hProcessandoEm?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   pet: Prisma.PetCreateNestedOneWithoutAgendamentosInput
@@ -780,6 +808,7 @@ export type AgendamentoUncheckedCreateWithoutProfissionalInput = {
   observacoes?: string | null
   lembrete24hEnviadoEm?: Date | string | null
   lembrete24hUltimoErro?: string | null
+  lembrete24hProcessandoEm?: Date | string | null
   petId: number
   servicoId: number
   createdAt?: Date | string
@@ -819,6 +848,7 @@ export type AgendamentoCreateManyServicoInput = {
   observacoes?: string | null
   lembrete24hEnviadoEm?: Date | string | null
   lembrete24hUltimoErro?: string | null
+  lembrete24hProcessandoEm?: Date | string | null
   petId: number
   profissionalId: number
   createdAt?: Date | string
@@ -831,6 +861,7 @@ export type AgendamentoUpdateWithoutServicoInput = {
   observacoes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lembrete24hEnviadoEm?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lembrete24hUltimoErro?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lembrete24hProcessandoEm?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pet?: Prisma.PetUpdateOneRequiredWithoutAgendamentosNestedInput
@@ -844,6 +875,7 @@ export type AgendamentoUncheckedUpdateWithoutServicoInput = {
   observacoes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lembrete24hEnviadoEm?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lembrete24hUltimoErro?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lembrete24hProcessandoEm?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   petId?: Prisma.IntFieldUpdateOperationsInput | number
   profissionalId?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -857,6 +889,7 @@ export type AgendamentoUncheckedUpdateManyWithoutServicoInput = {
   observacoes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lembrete24hEnviadoEm?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lembrete24hUltimoErro?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lembrete24hProcessandoEm?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   petId?: Prisma.IntFieldUpdateOperationsInput | number
   profissionalId?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -870,6 +903,7 @@ export type AgendamentoCreateManyPetInput = {
   observacoes?: string | null
   lembrete24hEnviadoEm?: Date | string | null
   lembrete24hUltimoErro?: string | null
+  lembrete24hProcessandoEm?: Date | string | null
   servicoId: number
   profissionalId: number
   createdAt?: Date | string
@@ -882,6 +916,7 @@ export type AgendamentoUpdateWithoutPetInput = {
   observacoes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lembrete24hEnviadoEm?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lembrete24hUltimoErro?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lembrete24hProcessandoEm?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   servico?: Prisma.ServicoUpdateOneRequiredWithoutAgendamentosNestedInput
@@ -895,6 +930,7 @@ export type AgendamentoUncheckedUpdateWithoutPetInput = {
   observacoes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lembrete24hEnviadoEm?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lembrete24hUltimoErro?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lembrete24hProcessandoEm?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   servicoId?: Prisma.IntFieldUpdateOperationsInput | number
   profissionalId?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -908,6 +944,7 @@ export type AgendamentoUncheckedUpdateManyWithoutPetInput = {
   observacoes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lembrete24hEnviadoEm?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lembrete24hUltimoErro?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lembrete24hProcessandoEm?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   servicoId?: Prisma.IntFieldUpdateOperationsInput | number
   profissionalId?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -921,6 +958,7 @@ export type AgendamentoCreateManyProfissionalInput = {
   observacoes?: string | null
   lembrete24hEnviadoEm?: Date | string | null
   lembrete24hUltimoErro?: string | null
+  lembrete24hProcessandoEm?: Date | string | null
   petId: number
   servicoId: number
   createdAt?: Date | string
@@ -933,6 +971,7 @@ export type AgendamentoUpdateWithoutProfissionalInput = {
   observacoes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lembrete24hEnviadoEm?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lembrete24hUltimoErro?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lembrete24hProcessandoEm?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pet?: Prisma.PetUpdateOneRequiredWithoutAgendamentosNestedInput
@@ -946,6 +985,7 @@ export type AgendamentoUncheckedUpdateWithoutProfissionalInput = {
   observacoes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lembrete24hEnviadoEm?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lembrete24hUltimoErro?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lembrete24hProcessandoEm?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   petId?: Prisma.IntFieldUpdateOperationsInput | number
   servicoId?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -959,6 +999,7 @@ export type AgendamentoUncheckedUpdateManyWithoutProfissionalInput = {
   observacoes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lembrete24hEnviadoEm?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lembrete24hUltimoErro?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lembrete24hProcessandoEm?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   petId?: Prisma.IntFieldUpdateOperationsInput | number
   servicoId?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -974,6 +1015,7 @@ export type AgendamentoSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   observacoes?: boolean
   lembrete24hEnviadoEm?: boolean
   lembrete24hUltimoErro?: boolean
+  lembrete24hProcessandoEm?: boolean
   petId?: boolean
   servicoId?: boolean
   profissionalId?: boolean
@@ -991,6 +1033,7 @@ export type AgendamentoSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   observacoes?: boolean
   lembrete24hEnviadoEm?: boolean
   lembrete24hUltimoErro?: boolean
+  lembrete24hProcessandoEm?: boolean
   petId?: boolean
   servicoId?: boolean
   profissionalId?: boolean
@@ -1008,6 +1051,7 @@ export type AgendamentoSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   observacoes?: boolean
   lembrete24hEnviadoEm?: boolean
   lembrete24hUltimoErro?: boolean
+  lembrete24hProcessandoEm?: boolean
   petId?: boolean
   servicoId?: boolean
   profissionalId?: boolean
@@ -1025,6 +1069,7 @@ export type AgendamentoSelectScalar = {
   observacoes?: boolean
   lembrete24hEnviadoEm?: boolean
   lembrete24hUltimoErro?: boolean
+  lembrete24hProcessandoEm?: boolean
   petId?: boolean
   servicoId?: boolean
   profissionalId?: boolean
@@ -1032,7 +1077,7 @@ export type AgendamentoSelectScalar = {
   updatedAt?: boolean
 }
 
-export type AgendamentoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "dataHora" | "status" | "observacoes" | "lembrete24hEnviadoEm" | "lembrete24hUltimoErro" | "petId" | "servicoId" | "profissionalId" | "createdAt" | "updatedAt", ExtArgs["result"]["agendamento"]>
+export type AgendamentoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "dataHora" | "status" | "observacoes" | "lembrete24hEnviadoEm" | "lembrete24hUltimoErro" | "lembrete24hProcessandoEm" | "petId" | "servicoId" | "profissionalId" | "createdAt" | "updatedAt", ExtArgs["result"]["agendamento"]>
 export type AgendamentoInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   pet?: boolean | Prisma.PetDefaultArgs<ExtArgs>
   servico?: boolean | Prisma.ServicoDefaultArgs<ExtArgs>
@@ -1063,6 +1108,7 @@ export type $AgendamentoPayload<ExtArgs extends runtime.Types.Extensions.Interna
     observacoes: string | null
     lembrete24hEnviadoEm: Date | null
     lembrete24hUltimoErro: string | null
+    lembrete24hProcessandoEm: Date | null
     petId: number
     servicoId: number
     profissionalId: number
@@ -1500,6 +1546,7 @@ export interface AgendamentoFieldRefs {
   readonly observacoes: Prisma.FieldRef<"Agendamento", 'String'>
   readonly lembrete24hEnviadoEm: Prisma.FieldRef<"Agendamento", 'DateTime'>
   readonly lembrete24hUltimoErro: Prisma.FieldRef<"Agendamento", 'String'>
+  readonly lembrete24hProcessandoEm: Prisma.FieldRef<"Agendamento", 'DateTime'>
   readonly petId: Prisma.FieldRef<"Agendamento", 'Int'>
   readonly servicoId: Prisma.FieldRef<"Agendamento", 'Int'>
   readonly profissionalId: Prisma.FieldRef<"Agendamento", 'Int'>
