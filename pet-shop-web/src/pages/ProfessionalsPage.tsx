@@ -16,6 +16,22 @@ import Sidebar from "../components/Sidebar";
 import "./DashboardPage.css";
 import "./ProfessionalsPage.css";
 
+type PerfilUsuario =
+  | "CLIENTE"
+  | "ATENDENTE"
+  | "ADMINISTRADOR";
+
+type Usuario = {
+  id: number;
+  nome: string;
+  email: string;
+  perfil: PerfilUsuario;
+};
+
+type AuthResponse = {
+  usuario: Usuario;
+};
+
 type Profissional = {
   id: number;
   nome: string;
@@ -89,6 +105,13 @@ export default function ProfessionalsPage() {
     useNavigate();
 
   const [
+    perfil,
+    setPerfil,
+  ] = useState<PerfilUsuario | null>(
+    null,
+  );
+
+  const [
     profissionais,
     setProfissionais,
   ] = useState<Profissional[]>([]);
@@ -140,15 +163,27 @@ export default function ProfessionalsPage() {
   const [erro, setErro] =
     useState("");
 
+  const podeEditar =
+    perfil === "ADMINISTRADOR";
+
   async function carregarDados() {
     setCarregando(true);
     setErro("");
 
     try {
       const [
+        authResponse,
         profissionaisResponse,
         servicosResponse,
       ] = await Promise.all([
+        fetch(
+          "/api/auth/me",
+          {
+            credentials:
+              "include",
+          },
+        ),
+
         fetch(
           "/api/profissionais",
           {
@@ -167,6 +202,16 @@ export default function ProfessionalsPage() {
       ]);
 
       if (
+        authResponse.status === 401
+      ) {
+        navigate(
+          "/login",
+        );
+
+        return;
+      }
+
+      if (
         profissionaisResponse.status ===
         403
       ) {
@@ -175,6 +220,15 @@ export default function ProfessionalsPage() {
         );
 
         return;
+      }
+
+      if (!authResponse.ok) {
+        throw new Error(
+          await obterMensagemErro(
+            authResponse,
+            "Não foi possível carregar o usuário",
+          ),
+        );
       }
 
       if (
@@ -199,11 +253,18 @@ export default function ProfessionalsPage() {
         );
       }
 
+      const authData =
+        (await authResponse.json()) as AuthResponse;
+
       const profissionaisData =
         (await profissionaisResponse.json()) as Profissional[];
 
       const servicosData =
         (await servicosResponse.json()) as Servico[];
+
+      setPerfil(
+        authData.usuario.perfil,
+      );
 
       setProfissionais(
         profissionaisData,
@@ -231,6 +292,10 @@ export default function ProfessionalsPage() {
   }, []);
 
   function abrirNovoProfissional() {
+    if (!podeEditar) {
+      return;
+    }
+
     setProfissionalEditando(
       null,
     );
@@ -257,6 +322,10 @@ export default function ProfessionalsPage() {
   async function abrirEdicao(
     profissional: Profissional,
   ) {
+    if (!podeEditar) {
+      return;
+    }
+
     setErro("");
 
     try {
@@ -347,6 +416,10 @@ export default function ProfessionalsPage() {
   function alterarServico(
     servicoId: number,
   ) {
+    if (!podeEditar) {
+      return;
+    }
+
     setServicosSelecionados(
       (atuais) => {
         if (
@@ -440,6 +513,14 @@ export default function ProfessionalsPage() {
     event: FormEvent<HTMLFormElement>,
   ) {
     event.preventDefault();
+
+    if (!podeEditar) {
+      setErro(
+        "Você não possui permissão para alterar profissionais",
+      );
+
+      return;
+    }
 
     setErro("");
 
@@ -569,6 +650,14 @@ export default function ProfessionalsPage() {
   async function alterarStatus(
     profissional: Profissional,
   ) {
+    if (!podeEditar) {
+      setErro(
+        "Você não possui permissão para alterar profissionais",
+      );
+
+      return;
+    }
+
     setErro("");
 
     try {
@@ -629,22 +718,23 @@ export default function ProfessionalsPage() {
             </h1>
 
             <p>
-              Cadastre e gerencie
-              os profissionais e
-              os serviços que cada
-              um realiza.
+              {podeEditar
+                ? "Cadastre e gerencie os profissionais e os serviços que cada um realiza."
+                : "Consulte os profissionais cadastrados no sistema."}
             </p>
           </div>
 
-          <button
-            type="button"
-            className="professionals-new-button"
-            onClick={
-              abrirNovoProfissional
-            }
-          >
-            + Novo profissional
-          </button>
+          {podeEditar && (
+            <button
+              type="button"
+              className="professionals-new-button"
+              onClick={
+                abrirNovoProfissional
+              }
+            >
+              + Novo profissional
+            </button>
+          )}
         </header>
 
         {erro && (
@@ -653,198 +743,202 @@ export default function ProfessionalsPage() {
           </div>
         )}
 
-        {mostrarFormulario && (
-          <section className="professional-form-card">
-            <div className="professional-form-header">
-              <div>
-                <span className="panel-eyebrow">
-                  {profissionalEditando
-                    ? "Editar"
-                    : "Novo"}
-                </span>
+        {podeEditar &&
+          mostrarFormulario && (
+            <section className="professional-form-card">
+              <div className="professional-form-header">
+                <div>
+                  <span className="panel-eyebrow">
+                    {profissionalEditando
+                      ? "Editar"
+                      : "Novo"}
+                  </span>
 
-                <h2>
-                  {profissionalEditando
-                    ? "Editar profissional"
-                    : "Cadastrar profissional"}
-                </h2>
-              </div>
-
-              <button
-                type="button"
-                className="professional-close-button"
-                onClick={
-                  fecharFormulario
-                }
-              >
-                Fechar
-              </button>
-            </div>
-
-            <form
-              onSubmit={
-                handleSubmit
-              }
-            >
-              <div className="professional-form-grid">
-                <label>
-                  Nome
-
-                  <input
-                    type="text"
-                    value={
-                      formulario.nome
-                    }
-                    onChange={(
-                      event,
-                    ) =>
-                      setFormulario(
-                        {
-                          ...formulario,
-                          nome:
-                            event
-                              .target
-                              .value,
-                        },
-                      )
-                    }
-                    placeholder="Nome completo"
-                  />
-                </label>
-
-                <label>
-                  E-mail
-
-                  <input
-                    type="email"
-                    value={
-                      formulario.email
-                    }
-                    onChange={(
-                      event,
-                    ) =>
-                      setFormulario(
-                        {
-                          ...formulario,
-                          email:
-                            event
-                              .target
-                              .value,
-                        },
-                      )
-                    }
-                    placeholder="email@exemplo.com"
-                  />
-                </label>
-
-                <label>
-                  Telefone
-
-                  <input
-                    type="text"
-                    value={
-                      formulario.telefone
-                    }
-                    onChange={(
-                      event,
-                    ) =>
-                      setFormulario(
-                        {
-                          ...formulario,
-                          telefone:
-                            event
-                              .target
-                              .value,
-                        },
-                      )
-                    }
-                    placeholder="(54) 99999-9999"
-                  />
-                </label>
-              </div>
-
-              <div className="professional-services-section">
-                <h3>
-                  Serviços que realiza
-                </h3>
-
-                <p>
-                  Selecione os
-                  serviços que
-                  poderão ser
-                  agendados com
-                  este profissional.
-                </p>
-
-                <div className="professional-services-list">
-                  {servicos.map(
-                    (servico) => (
-                      <label
-                        key={
-                          servico.id
-                        }
-                        className="professional-service-option"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={
-                            servicosSelecionados.includes(
-                              servico.id,
-                            )
-                          }
-                          onChange={() =>
-                            alterarServico(
-                              servico.id,
-                            )
-                          }
-                        />
-
-                        <div>
-                          <strong>
-                            {
-                              servico.nome
-                            }
-                          </strong>
-
-                          <span>
-                            {
-                              servico.duracao
-                            }{" "}
-                            min
-                          </span>
-                        </div>
-                      </label>
-                    ),
-                  )}
+                  <h2>
+                    {profissionalEditando
+                      ? "Editar profissional"
+                      : "Cadastrar profissional"}
+                  </h2>
                 </div>
-              </div>
 
-              <div className="professional-form-actions">
                 <button
                   type="button"
-                  className="professional-cancel-button"
+                  className="professional-close-button"
                   onClick={
                     fecharFormulario
                   }
                 >
-                  Cancelar
-                </button>
-
-                <button
-                  type="submit"
-                  className="professionals-new-button"
-                  disabled={
-                    salvando
-                  }
-                >
-                  {salvando
-                    ? "Salvando..."
-                    : "Salvar profissional"}
+                  Fechar
                 </button>
               </div>
-            </form>
-          </section>
-        )}
+
+              <form
+                onSubmit={
+                  handleSubmit
+                }
+              >
+                <div className="professional-form-grid">
+                  <label>
+                    Nome
+
+                    <input
+                      type="text"
+                      value={
+                        formulario.nome
+                      }
+                      onChange={(
+                        event,
+                      ) =>
+                        setFormulario(
+                          {
+                            ...formulario,
+
+                            nome:
+                              event
+                                .target
+                                .value,
+                          },
+                        )
+                      }
+                      placeholder="Nome completo"
+                    />
+                  </label>
+
+                  <label>
+                    E-mail
+
+                    <input
+                      type="email"
+                      value={
+                        formulario.email
+                      }
+                      onChange={(
+                        event,
+                      ) =>
+                        setFormulario(
+                          {
+                            ...formulario,
+
+                            email:
+                              event
+                                .target
+                                .value,
+                          },
+                        )
+                      }
+                      placeholder="email@exemplo.com"
+                    />
+                  </label>
+
+                  <label>
+                    Telefone
+
+                    <input
+                      type="text"
+                      value={
+                        formulario.telefone
+                      }
+                      onChange={(
+                        event,
+                      ) =>
+                        setFormulario(
+                          {
+                            ...formulario,
+
+                            telefone:
+                              event
+                                .target
+                                .value,
+                          },
+                        )
+                      }
+                      placeholder="(54) 99999-9999"
+                    />
+                  </label>
+                </div>
+
+                <div className="professional-services-section">
+                  <h3>
+                    Serviços que realiza
+                  </h3>
+
+                  <p>
+                    Selecione os
+                    serviços que
+                    poderão ser
+                    agendados com
+                    este profissional.
+                  </p>
+
+                  <div className="professional-services-list">
+                    {servicos.map(
+                      (servico) => (
+                        <label
+                          key={
+                            servico.id
+                          }
+                          className="professional-service-option"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={
+                              servicosSelecionados.includes(
+                                servico.id,
+                              )
+                            }
+                            onChange={() =>
+                              alterarServico(
+                                servico.id,
+                              )
+                            }
+                          />
+
+                          <div>
+                            <strong>
+                              {
+                                servico.nome
+                              }
+                            </strong>
+
+                            <span>
+                              {
+                                servico.duracao
+                              }{" "}
+                              min
+                            </span>
+                          </div>
+                        </label>
+                      ),
+                    )}
+                  </div>
+                </div>
+
+                <div className="professional-form-actions">
+                  <button
+                    type="button"
+                    className="professional-cancel-button"
+                    onClick={
+                      fecharFormulario
+                    }
+                  >
+                    Cancelar
+                  </button>
+
+                  <button
+                    type="submit"
+                    className="professionals-new-button"
+                    disabled={
+                      salvando
+                    }
+                  >
+                    {salvando
+                      ? "Salvando..."
+                      : "Salvar profissional"}
+                  </button>
+                </div>
+              </form>
+            </section>
+          )}
 
         <section className="professionals-list-card">
           <div className="professional-list-header">
@@ -880,9 +974,8 @@ export default function ProfessionalsPage() {
               </h3>
 
               <p>
-                Cadastre o primeiro
-                profissional para
-                começar.
+                Nenhum profissional
+                foi encontrado.
               </p>
             </div>
           ) : (
@@ -939,37 +1032,39 @@ export default function ProfessionalsPage() {
                       </div>
                     </div>
 
-                    <div className="professional-actions">
-                      <button
-                        type="button"
-                        className="professional-edit-button"
-                        onClick={() =>
-                          void abrirEdicao(
-                            profissional,
-                          )
-                        }
-                      >
-                        Editar
-                      </button>
+                    {podeEditar && (
+                      <div className="professional-actions">
+                        <button
+                          type="button"
+                          className="professional-edit-button"
+                          onClick={() =>
+                            void abrirEdicao(
+                              profissional,
+                            )
+                          }
+                        >
+                          Editar
+                        </button>
 
-                      <button
-                        type="button"
-                        className={
-                          profissional.ativo
-                            ? "professional-status-button danger"
-                            : "professional-status-button success"
-                        }
-                        onClick={() =>
-                          void alterarStatus(
-                            profissional,
-                          )
-                        }
-                      >
-                        {profissional.ativo
-                          ? "Inativar"
-                          : "Ativar"}
-                      </button>
-                    </div>
+                        <button
+                          type="button"
+                          className={
+                            profissional.ativo
+                              ? "professional-status-button danger"
+                              : "professional-status-button success"
+                          }
+                          onClick={() =>
+                            void alterarStatus(
+                              profissional,
+                            )
+                          }
+                        >
+                          {profissional.ativo
+                            ? "Inativar"
+                            : "Ativar"}
+                        </button>
+                      </div>
+                    )}
                   </div>
                 ),
               )}

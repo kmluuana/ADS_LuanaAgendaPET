@@ -24,10 +24,12 @@ const router = Router();
 
 router.use(exigirAutenticacao);
 
-/*
+/**
  * Usado no agendamento.
  *
- * CLIENTE também precisa acessar essa rota.
+ * CLIENTE também precisa acessar essa rota,
+ * pois precisa visualizar os profissionais
+ * disponíveis para o serviço escolhido.
  */
 router.get(
   "/por-servico/:servicoId",
@@ -56,11 +58,11 @@ router.get(
   },
 );
 
-/*
+/**
  * A partir daqui:
  *
  * ATENDENTE e ADMINISTRADOR
- * podem acessar.
+ * possuem acesso de consulta.
  */
 router.use(
   exigirPerfil(
@@ -69,7 +71,7 @@ router.use(
   ),
 );
 
-/*
+/**
  * Lista todos os profissionais.
  */
 router.get(
@@ -93,7 +95,7 @@ router.get(
   },
 );
 
-/*
+/**
  * Busca profissional pelo ID.
  */
 router.get(
@@ -123,7 +125,53 @@ router.get(
   },
 );
 
-/*
+/**
+ * Lista serviços do profissional.
+ *
+ * ATENDENTE pode consultar,
+ * mas não pode alterar vínculos.
+ */
+router.get(
+  "/:id/servicos",
+  async (request, response) => {
+    try {
+      const profissionalId =
+        Number(
+          request.params.id,
+        );
+
+      const servicos =
+        await buscarServicosDoProfissional(
+          profissionalId,
+        );
+
+      response.json(
+        servicos,
+      );
+    } catch (error) {
+      response.status(400).json({
+        message:
+          error instanceof Error
+            ? error.message
+            : "Erro ao buscar serviços do profissional",
+      });
+    }
+  },
+);
+
+/**
+ * A partir daqui:
+ *
+ * somente ADMINISTRADOR
+ * pode realizar alterações.
+ */
+router.use(
+  exigirPerfil(
+    "ADMINISTRADOR",
+  ),
+);
+
+/**
  * Cadastra profissional.
  */
 router.post(
@@ -158,7 +206,7 @@ router.post(
   },
 );
 
-/*
+/**
  * Edita profissional.
  */
 router.put(
@@ -198,7 +246,7 @@ router.put(
   },
 );
 
-/*
+/**
  * Ativa ou inativa profissional.
  */
 router.patch(
@@ -229,38 +277,7 @@ router.patch(
   },
 );
 
-/*
- * Lista serviços do profissional.
- */
-router.get(
-  "/:id/servicos",
-  async (request, response) => {
-    try {
-      const profissionalId =
-        Number(
-          request.params.id,
-        );
-
-      const servicos =
-        await buscarServicosDoProfissional(
-          profissionalId,
-        );
-
-      response.json(
-        servicos,
-      );
-    } catch (error) {
-      response.status(400).json({
-        message:
-          error instanceof Error
-            ? error.message
-            : "Erro ao buscar serviços do profissional",
-      });
-    }
-  },
-);
-
-/*
+/**
  * Vincula serviço ao profissional.
  */
 router.post(
@@ -299,7 +316,7 @@ router.post(
   },
 );
 
-/*
+/**
  * Remove vínculo entre
  * profissional e serviço.
  */

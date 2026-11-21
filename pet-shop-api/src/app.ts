@@ -9,6 +9,7 @@ import profissionalRoutes from "./profissionais/profissional.routes";
 import profissionalServicoRoutes from "./profissionais/profissional-servico.routes";
 import agendamentoRoutes from "./agendamentos/agendamento.routes";
 import authRoutes from "./auth/auth.routes";
+import lembreteRoutes from "./lembrete/lembrete.routes";
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use("/profissionais", profissionalRoutes);
 app.use("/profissionais", profissionalServicoRoutes);
 app.use("/agendamentos", agendamentoRoutes);
 app.use("/auth", authRoutes);
+app.use("/lembretes", lembreteRoutes);
 
 app.get("/health", (_request, response) => {
   response.json({

@@ -33,7 +33,9 @@ export async function listarAgendamentosPorCliente(
   });
 }
 
-export async function obterAgendamentoPorId(id: number) {
+export async function obterAgendamentoPorId(
+  id: number,
+) {
   return db.agendamento.findUnique({
     where: {
       id,
@@ -46,13 +48,15 @@ export async function obterAgendamentoPorId(id: number) {
   });
 }
 
-export async function criarAgendamento(dados: {
-  dataHora: Date;
-  observacoes?: string;
-  petId: number;
-  servicoId: number;
-  profissionalId: number;
-}) {
+export async function criarAgendamento(
+  dados: {
+    dataHora: Date;
+    observacoes?: string;
+    petId: number;
+    servicoId: number;
+    profissionalId: number;
+  },
+) {
   return db.agendamento.create({
     data: {
       dataHora: dados.dataHora,
@@ -90,7 +94,10 @@ export async function atualizarAgendamento(
 
 export async function atualizarStatusAgendamento(
   id: number,
-  status: "AGENDADO" | "CONCLUIDO" | "CANCELADO",
+  status:
+    | "AGENDADO"
+    | "CONCLUIDO"
+    | "CANCELADO",
 ) {
   return db.agendamento.update({
     where: {
@@ -115,6 +122,88 @@ export async function listarAgendamentosAtivosDoProfissional(
     },
     orderBy: {
       dataHora: "asc",
+    },
+  });
+}
+
+/**
+ * Busca os agendamentos que devem
+ * receber o lembrete de 24 horas.
+ *
+ * A janela de horário é recebida
+ * pelo service.
+ */
+export async function listarLembretes24hPendentes(
+  inicio: Date,
+  fim: Date,
+) {
+  return db.agendamento.findMany({
+    where: {
+      status: "AGENDADO",
+
+      lembrete24hEnviadoEm: null,
+
+      dataHora: {
+        gte: inicio,
+        lt: fim,
+      },
+    },
+
+    include: {
+      pet: {
+        include: {
+          cliente: true,
+        },
+      },
+
+      servico: true,
+
+      profissional: true,
+    },
+
+    orderBy: {
+      dataHora: "asc",
+    },
+  });
+}
+
+/**
+ * Marca o lembrete como enviado.
+ */
+export async function marcarLembrete24hEnviado(
+  agendamentoId: number,
+) {
+  return db.agendamento.update({
+    where: {
+      id: agendamentoId,
+    },
+
+    data: {
+      lembrete24hEnviadoEm:
+        new Date(),
+
+      lembrete24hUltimoErro:
+        null,
+    },
+  });
+}
+
+/**
+ * Guarda o último erro ocorrido
+ * ao tentar enviar o lembrete.
+ */
+export async function registrarErroLembrete24h(
+  agendamentoId: number,
+  erro: string,
+) {
+  return db.agendamento.update({
+    where: {
+      id: agendamentoId,
+    },
+
+    data: {
+      lembrete24hUltimoErro:
+        erro,
     },
   });
 }

@@ -145,6 +145,8 @@ export const AgendamentoScalarFieldEnum = {
   dataHora: 'dataHora',
   status: 'status',
   observacoes: 'observacoes',
+  lembrete24hEnviadoEm: 'lembrete24hEnviadoEm',
+  lembrete24hUltimoErro: 'lembrete24hUltimoErro',
   petId: 'petId',
   servicoId: 'servicoId',
   profissionalId: 'profissionalId',
