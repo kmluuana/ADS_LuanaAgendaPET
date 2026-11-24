@@ -12,56 +12,74 @@ import {
 
 const router = Router();
 
-// Todas as rotas exigem autenticação de administrador
 router.use(
   exigirAutenticacao,
-  exigirPerfil("ADMINISTRADOR"),
+);
+
+router.use(
+  exigirPerfil(
+    "ADMINISTRADOR",
+  ),
 );
 
 /**
- * Consulta os agendamentos que possuem
- * lembretes de 24 horas pendentes.
- *
- * Não envia mensagens.
+ * Consulta quais agendamentos
+ * estão pendentes de lembrete.
  */
-router.get("/pendentes", async (_request, response) => {
-  try {
-    const lembretes = await buscarLembretes24hPendentes();
+router.get(
+  "/pendentes",
+  async (_request, response) => {
+    try {
+      const lembretes =
+        await buscarLembretes24hPendentes();
 
-    response.json({
-      quantidade: lembretes.length,
-      lembretes,
-    });
-  } catch (error) {
-    console.error("Erro ao buscar lembretes:", error);
+      response.json({
+        quantidade:
+          lembretes.length,
 
-    response.status(500).json({
-      message: "Erro ao buscar lembretes pendentes",
-    });
-  }
-});
+        lembretes,
+      });
+    } catch (error) {
+      response
+        .status(500)
+        .json({
+          message:
+            error instanceof Error
+              ? error.message
+              : "Erro ao buscar lembretes pendentes",
+        });
+    }
+  },
+);
 
 /**
- * Processa os lembretes pendentes.
+ * Processa manualmente os
+ * lembretes pendentes.
  *
- * Busca agendamentos, envia mensagens
- * pelo WhatsApp e registra o resultado.
+ * Depois o job automático
+ * chamará o mesmo service.
  */
-router.post("/processar", async (_request, response) => {
-  try {
-    const resultado = await processarLembretes24h();
+router.post(
+  "/processar",
+  async (_request, response) => {
+    try {
+      const resultado =
+        await processarLembretes24h();
 
-    response.status(200).json({
-      message: "Processamento de lembretes finalizado",
-      resultado,
-    });
-  } catch (error) {
-    console.error("Erro ao processar lembretes:", error);
-
-    response.status(500).json({
-      message: "Erro interno ao processar lembretes",
-    });
-  }
-});
+      response.json(
+        resultado,
+      );
+    } catch (error) {
+      response
+        .status(500)
+        .json({
+          message:
+            error instanceof Error
+              ? error.message
+              : "Erro ao processar lembretes",
+        });
+    }
+  },
+);
 
 export default router;

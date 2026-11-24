@@ -1,152 +1,124 @@
+import "dotenv/config";
 
 type EnviarMensagemInput = {
   telefone: string;
   mensagem: string;
 };
 
-type RespostaOmni = {
-  messageId: string;
+type OmniResponse = {
+  messageId?: string;
+  code?: string;
+  subCode?: string;
+  message?: string;
+  error?: number | string;
 };
 
-export type TipoErroZApi =
-  | "CONFIGURACAO"
-  | "VALIDACAO"
-  | "REJEITADO"
-  | "INCERTO";
-
-export class ErroZApi extends Error {
-  constructor(
-    message: string,
-    public readonly tipo: TipoErroZApi,
-    public readonly status?: number,
-  ) {
-    super(message);
-    this.name = "ErroZApi";
-  }
-}
-
-const TIMEOUT_MS = 15_000;
-
 function obterConfiguracao() {
-  const channelId = process.env.OMNI_CHANNEL_ID;
-  const secretKey = process.env.OMNI_SECRET_KEY;
+  const channelId =
+    process.env.OMNI_CHANNEL_ID;
 
-  if (!channelId || !secretKey) {
-    throw new ErroZApi(
-      "Configuração da Z-API Omni não informada",
-      "CONFIGURACAO",
-    );
-  }
-
-  return { channelId, secretKey };
-}
-
-function normalizarTelefone(telefone: string): string {
-  const numeros = telefone.replace(/\D/g, "");
-
-  const numeroBrasil = numeros.startsWith("55")
-    ? numeros.slice(2)
-    : numeros;
-
-  if (!/^[1-9][0-9]\d{8,9}$/.test(numeroBrasil)) {
-    throw new ErroZApi(
-      "Telefone brasileiro inválido",
-      "VALIDACAO",
-    );
-  }
-
-  return `55${numeroBrasil}`;
-}
-
-export async function enviarMensagemWhatsApp(
-  input: EnviarMensagemInput,
-): Promise<RespostaOmni> {
-  const telefone = normalizarTelefone(input.telefone);
-
-  if (!input.mensagem.trim()) {
-    throw new ErroZApi(
-      "A mensagem não pode estar vazia",
-      "VALIDACAO",
-    );
-  }
-
-  const { channelId, secretKey } = obterConfiguracao();
-
-  const url =
-    `https://api.omni.z-api.io/v1/channels/` +
-    `${encodeURIComponent(channelId)}/messages`;
-
-  let response: Response;
-
-  try {
-    response = await fetch(url, {
-      method: "POST",
-
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${secretKey}`,
-      },
-
-      body: JSON.stringify({
-        recipient: {
-          identifier: telefone,
-        },
-        content: {
-          type: "TEXT",
-          body: {
-            message: input.mensagem,
-          },
-        },
-      }),
-
-      signal: AbortSignal.timeout(TIMEOUT_MS),
-    });
-  } catch {
-    throw new ErroZApi(
-      "Falha de comunicação ou timeout na Omni. " +
-        "O resultado do envio é desconhecido.",
-      "INCERTO",
-    );
-  }
-
-  if (!response.ok) {
-    const rejeicaoDefinitiva =
-      response.status >= 400 &&
-      response.status < 500 &&
-      ![408, 409, 425, 429].includes(response.status);
-
-    throw new ErroZApi(
-      `Omni retornou HTTP ${response.status}`,
-      rejeicaoDefinitiva ? "REJEITADO" : "INCERTO",
-      response.status,
-    );
-  }
-
-  let resultado: unknown;
-
-  try {
-    resultado = await response.json();
-  } catch {
-    throw new ErroZApi(
-      "A Omni aceitou a requisição, mas retornou JSON inválido",
-      "INCERTO",
-    );
-  }
+  const secretKey =
+    process.env.OMNI_SECRET_KEY;
 
   if (
-    typeof resultado !== "object" ||
-    resultado === null ||
-    !("messageId" in resultado) ||
-    typeof resultado.messageId !== "string" ||
-    !resultado.messageId.trim()
+    !channelId ||
+    !secretKey
   ) {
-    throw new ErroZApi(
-      "Resposta da Omni sem identificador de mensagem",
-      "INCERTO",
+    throw new Error(
+      "Configuração da Z-API Omni não informada",
     );
   }
 
   return {
-    messageId: resultado.messageId,
+    channelId,
+    secretKey,
+  };
+}
+
+function normalizarTelefone(
+  telefone: string,
+) {
+  const numeros =
+    telefone.replace(/\D/g, "");
+
+  if (
+    numeros.startsWith("55")
+  ) {
+    return numeros;
+  }
+
+  return `55${numeros}`;
+}
+
+export async function enviarMensagemWhatsApp(
+  input: EnviarMensagemInput,
+) {
+  const {
+    channelId,
+    secretKey,
+  } = obterConfiguracao();
+
+  const telefone =
+    normalizarTelefone(
+      input.telefone,
+    );
+
+  const url =
+    `https://api.omni.z-api.io/v1/channels/${channelId}/messages`;
+
+  const response =
+    await fetch(
+      url,
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type":
+            "application/json",
+
+          Authorization:
+            `Bearer ${secretKey}`,
+        },
+
+        body:
+          JSON.stringify({
+            recipient: {
+              identifier:
+                telefone,
+            },
+
+            content: {
+              type: "TEXT",
+
+              body: {
+                message:
+                  input.mensagem,
+              },
+            },
+          }),
+      },
+    );
+
+  const data =
+    (await response.json()) as OmniResponse;
+
+  if (!response.ok) {
+    throw new Error(
+      data.message ||
+        data.subCode ||
+        data.code ||
+        `Erro ao enviar mensagem pela Z-API Omni: ${response.status}`,
+    );
+  }
+
+  if (!data.messageId) {
+    throw new Error(
+      "Z-API Omni não retornou o identificador da mensagem",
+    );
+  }
+
+  return {
+    messageId:
+      data.messageId,
   };
 }

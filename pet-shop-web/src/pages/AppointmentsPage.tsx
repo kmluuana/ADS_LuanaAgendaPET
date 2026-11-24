@@ -6,12 +6,29 @@ import {
 
 import {
   Link,
+  useNavigate,
 } from "react-router";
 
 import Sidebar from "../components/Sidebar";
 
 import "./DashboardPage.css";
 import "./AppointmentsPage.css";
+
+type PerfilUsuario =
+  | "CLIENTE"
+  | "ATENDENTE"
+  | "ADMINISTRADOR";
+
+type Usuario = {
+  id: number;
+  nome: string;
+  email: string;
+  perfil: PerfilUsuario;
+};
+
+type AuthResponse = {
+  usuario: Usuario;
+};
 
 type StatusAgendamento =
   | "AGENDADO"
@@ -46,6 +63,16 @@ type Appointment = {
 };
 
 export default function AppointmentsPage() {
+  const navigate =
+    useNavigate();
+
+  const [
+    perfil,
+    setPerfil,
+  ] = useState<PerfilUsuario | null>(
+    null,
+  );
+
   const [
     agendamentos,
     setAgendamentos,
@@ -56,36 +83,88 @@ export default function AppointmentsPage() {
       "TODOS",
     );
 
-  const [carregando, setCarregando] =
-    useState(true);
+  const [
+    carregando,
+    setCarregando,
+  ] = useState(true);
 
   const [erro, setErro] =
     useState("");
 
+  const podeEditar =
+    perfil === "ATENDENTE" ||
+    perfil === "ADMINISTRADOR";
+
   async function carregarAgendamentos() {
     try {
-      const response = await fetch(
-        "/api/agendamentos",
-        {
-          credentials: "include",
-        },
-      );
+      const [
+        authResponse,
+        agendamentosResponse,
+      ] = await Promise.all([
+        fetch(
+          "/api/auth/me",
+          {
+            credentials:
+              "include",
+          },
+        ),
 
-      const data =
-        await response.json();
+        fetch(
+          "/api/agendamentos",
+          {
+            credentials:
+              "include",
+          },
+        ),
+      ]);
 
-      if (!response.ok) {
+      if (
+        authResponse.status === 401
+      ) {
+        navigate(
+          "/login",
+        );
+
+        return;
+      }
+
+      const authData =
+        (await authResponse.json()) as AuthResponse;
+
+      const agendamentosData =
+        await agendamentosResponse.json();
+
+      if (!authResponse.ok) {
         throw new Error(
-          data.message ??
+          "Não foi possível carregar o usuário",
+        );
+      }
+
+      if (
+        !agendamentosResponse.ok
+      ) {
+        throw new Error(
+          agendamentosData.message ??
             "Não foi possível carregar os agendamentos",
         );
       }
 
-      setAgendamentos(data);
+      setPerfil(
+        authData.usuario.perfil,
+      );
+
+      setAgendamentos(
+        agendamentosData,
+      );
+
       setErro("");
     } catch (error) {
-      if (error instanceof Error) {
-        setErro(error.message);
+      if (
+        error instanceof Error
+      ) {
+        setErro(
+          error.message,
+        );
       }
     } finally {
       setCarregando(false);
@@ -113,7 +192,10 @@ export default function AppointmentsPage() {
             );
           },
         ),
-      [agendamentos, filtro],
+      [
+        agendamentos,
+        filtro,
+      ],
     );
 
   const totalAgendados =
@@ -162,22 +244,27 @@ export default function AppointmentsPage() {
     }
 
     try {
-      const response = await fetch(
-        `/api/agendamentos/${id}/status`,
-        {
-          method: "PATCH",
-          credentials: "include",
+      const response =
+        await fetch(
+          `/api/agendamentos/${id}/status`,
+          {
+            method: "PATCH",
 
-          headers: {
-            "Content-Type":
-              "application/json",
+            credentials:
+              "include",
+
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+
+            body:
+              JSON.stringify({
+                status:
+                  "CANCELADO",
+              }),
           },
-
-          body: JSON.stringify({
-            status: "CANCELADO",
-          }),
-        },
-      );
+        );
 
       const data =
         await response.json();
@@ -231,11 +318,15 @@ export default function AppointmentsPage() {
   function obterClasseStatus(
     status: StatusAgendamento,
   ) {
-    if (status === "AGENDADO") {
+    if (
+      status === "AGENDADO"
+    ) {
       return "appointment-status scheduled";
     }
 
-    if (status === "CONCLUIDO") {
+    if (
+      status === "CONCLUIDO"
+    ) {
       return "appointment-status completed";
     }
 
@@ -245,11 +336,15 @@ export default function AppointmentsPage() {
   function obterTextoStatus(
     status: StatusAgendamento,
   ) {
-    if (status === "AGENDADO") {
+    if (
+      status === "AGENDADO"
+    ) {
       return "Agendado";
     }
 
-    if (status === "CONCLUIDO") {
+    if (
+      status === "CONCLUIDO"
+    ) {
       return "Concluído";
     }
 
@@ -284,8 +379,9 @@ export default function AppointmentsPage() {
             </h1>
 
             <p>
-              Acompanhe seus serviços
-              agendados, concluídos e
+              Acompanhe seus
+              serviços agendados,
+              concluídos e
               cancelados.
             </p>
           </div>
@@ -348,8 +444,8 @@ export default function AppointmentsPage() {
               </h2>
 
               <p>
-                Visualize todos os seus
-                agendamentos.
+                Visualize todos os
+                seus agendamentos.
               </p>
             </div>
 
@@ -362,7 +458,9 @@ export default function AppointmentsPage() {
                     : "appointment-filter"
                 }
                 onClick={() =>
-                  setFiltro("TODOS")
+                  setFiltro(
+                    "TODOS",
+                  )
                 }
               >
                 Todos
@@ -433,8 +531,9 @@ export default function AppointmentsPage() {
               </h3>
 
               <p>
-                Não existem agendamentos
-                neste filtro.
+                Não existem
+                agendamentos neste
+                filtro.
               </p>
 
               <Link
@@ -447,7 +546,9 @@ export default function AppointmentsPage() {
           ) : (
             <div className="appointments-list">
               {agendamentosFiltrados.map(
-                (agendamento) => (
+                (
+                  agendamento,
+                ) => (
                   <article
                     key={
                       agendamento.id
@@ -585,6 +686,17 @@ export default function AppointmentsPage() {
                     </div>
 
                     <div className="appointment-list-actions">
+                      {agendamento.status ===
+                        "AGENDADO" &&
+                        podeEditar && (
+                          <Link
+                            to={`/agendamentos/${agendamento.id}/editar`}
+                            className="appointment-cancel-button"
+                          >
+                            Editar
+                          </Link>
+                        )}
+
                       {agendamento.status ===
                         "AGENDADO" && (
                         <button

@@ -6,72 +6,157 @@ import {
   obterServicoPorId,
 } from "./servico.repository";
 
+type ServicoInput = {
+  nome: string;
+  descricao?: string | null;
+  preco: number;
+  duracao: number;
+};
+
+function validarId(
+  id: number,
+) {
+  if (
+    !Number.isInteger(id) ||
+    id <= 0
+  ) {
+    throw new Error(
+      "ID do serviço inválido",
+    );
+  }
+}
+
+function normalizarDados(
+  dados: ServicoInput,
+) {
+  const nome =
+    dados.nome?.trim();
+
+  const descricao =
+    dados.descricao?.trim() ||
+    null;
+
+  const preco =
+    Number(dados.preco);
+
+  const duracao =
+    Number(dados.duracao);
+
+  if (
+    !nome ||
+    nome.length < 3
+  ) {
+    throw new Error(
+      "O nome do serviço deve possuir pelo menos 3 caracteres",
+    );
+  }
+
+  if (
+    !Number.isFinite(preco) ||
+    preco <= 0
+  ) {
+    throw new Error(
+      "Informe um preço válido",
+    );
+  }
+
+  if (
+    !Number.isInteger(
+      duracao,
+    ) ||
+    duracao <= 0
+  ) {
+    throw new Error(
+      "Informe uma duração válida em minutos",
+    );
+  }
+
+  return {
+    nome,
+    descricao,
+    preco,
+    duracao,
+  };
+}
+
 export async function buscarServicos() {
   return listarServicos();
 }
 
-export async function buscarServicoPorId(id: number) {
-  return obterServicoPorId(id);
+export async function buscarServicoPorId(
+  id: number,
+) {
+  validarId(id);
+
+  const servico =
+    await obterServicoPorId(
+      id,
+    );
+
+  if (!servico) {
+    throw new Error(
+      "Serviço não encontrado",
+    );
+  }
+
+  return servico;
 }
 
-export async function cadastrarServico(dados: {
-  nome: string;
-  descricao?: string;
-  preco: number;
-  duracao: number;
-}) {
-  validarServico(dados);
+export async function cadastrarServico(
+  dados: ServicoInput,
+) {
+  const dadosNormalizados =
+    normalizarDados(
+      dados,
+    );
 
-  return criarServico(dados);
+  return criarServico(
+    dadosNormalizados,
+  );
 }
 
 export async function editarServico(
   id: number,
-  dados: {
-    nome: string;
-    descricao?: string;
-    preco: number;
-    duracao: number;
-  },
+  dados: ServicoInput,
 ) {
-  const servico = await obterServicoPorId(id);
+  validarId(id);
 
-  if (!servico) {
-    return null;
-  }
+  await buscarServicoPorId(
+    id,
+  );
 
-  validarServico(dados);
+  const dadosNormalizados =
+    normalizarDados(
+      dados,
+    );
 
-  return atualizarServico(id, dados);
+  return atualizarServico(
+    id,
+    dadosNormalizados,
+  );
 }
 
 export async function alterarStatusServico(
   id: number,
   ativo: boolean,
 ) {
-  const servico = await obterServicoPorId(id);
+  validarId(id);
 
-  if (!servico) {
-    return null;
+  if (
+    typeof ativo !==
+    "boolean"
+  ) {
+    throw new Error(
+      "Status do serviço inválido",
+    );
   }
 
-  return atualizarStatusServico(id, ativo);
-}
+  await buscarServicoPorId(
+    id,
+  );
 
-function validarServico(dados: {
-  nome: string;
-  preco: number;
-  duracao: number;
-}) {
-  if (!dados.nome || dados.nome.trim() === "") {
-    throw new Error("Nome do serviço é obrigatório");
-  }
-
-  if (dados.preco <= 0) {
-    throw new Error("Preço deve ser maior que zero");
-  }
-
-  if (dados.duracao <= 0) {
-    throw new Error("Duração deve ser maior que zero");
-  }
+  return atualizarStatusServico(
+    id,
+    ativo,
+  );
 }

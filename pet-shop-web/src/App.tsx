@@ -17,12 +17,14 @@ import {
 import AppointmentsPage from "./pages/AppointmentsPage";
 import CompleteProfilePage from "./pages/CompleteProfilePage";
 import DashboardPage from "./pages/DashboardPage";
+import EditAppointmentPage from "./pages/EditAppointmentPage";
 import EditPetPage from "./pages/EditPetPage";
 import LoginPage from "./pages/LoginPage";
 import NewAppointmentPage from "./pages/NewAppointmentPage";
 import NewPetPage from "./pages/NewPetPage";
 import PetsPage from "./pages/PetsPage";
 import ProfessionalsPage from "./pages/ProfessionalsPage";
+import ServicesPage from "./pages/ServicesPage";
 
 type PerfilUsuario =
   | "CLIENTE"
@@ -48,7 +50,6 @@ type AuthResponse =
 
 type ProtectedRouteProps = {
   children: ReactNode;
-
   perfisPermitidos?: PerfilUsuario[];
 };
 
@@ -149,14 +150,6 @@ function ProtectedRoute({
     );
   }
 
-  /*
-   * Cliente precisa completar
-   * os dados antes de utilizar
-   * o sistema.
-   *
-   * Administrador e atendente
-   * não dependem de clienteId.
-   */
   if (
     usuario.perfil ===
       "CLIENTE" &&
@@ -270,6 +263,20 @@ export default function App() {
         />
 
         <Route
+          path="/agendamentos/:id/editar"
+          element={
+            <ProtectedRoute
+              perfisPermitidos={[
+                "ATENDENTE",
+                "ADMINISTRADOR",
+              ]}
+            >
+              <EditAppointmentPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
           path="/admin/profissionais"
           element={
             <ProtectedRoute
@@ -279,6 +286,20 @@ export default function App() {
               ]}
             >
               <ProfessionalsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/servicos"
+          element={
+            <ProtectedRoute
+              perfisPermitidos={[
+                "ATENDENTE",
+                "ADMINISTRADOR",
+              ]}
+            >
+              <ServicesPage />
             </ProtectedRoute>
           }
         />

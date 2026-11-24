@@ -1,6 +1,11 @@
 import { Router } from "express";
 
 import {
+  exigirAutenticacao,
+  exigirPerfil,
+} from "../auth/auth.middleware";
+
+import {
   alterarStatusServico,
   buscarServicoPorId,
   buscarServicos,
@@ -10,132 +15,210 @@ import {
 
 const router = Router();
 
-router.get("/", async (_request, response, next) => {
-  try {
-    const servicos = await buscarServicos();
+router.use(
+  exigirAutenticacao,
+);
 
-    response.json(servicos);
-  } catch (error) {
-    next(error);
-  }
-});
+/**
+ * Consulta todos os serviços.
+ *
+ * CLIENTE também precisa acessar
+ * essa rota para fazer agendamentos.
+ */
+router.get(
+  "/",
+  async (_request, response) => {
+    try {
+      const servicos =
+        await buscarServicos();
 
-router.get("/:id", async (request, response, next) => {
-  try {
-    const id = Number(request.params.id);
-
-    if (!Number.isInteger(id) || id <= 0) {
-      response.status(400).json({
-        message: "Id inválido",
-      });
-
-      return;
+      response.json(
+        servicos,
+      );
+    } catch (error) {
+      response
+        .status(500)
+        .json({
+          message:
+            error instanceof Error
+              ? error.message
+              : "Erro ao buscar serviços",
+        });
     }
+  },
+);
 
-    const servico = await buscarServicoPorId(id);
+/**
+ * Consulta um serviço pelo ID.
+ */
+router.get(
+  "/:id",
+  async (request, response) => {
+    try {
+      const id =
+        Number(
+          request.params.id,
+        );
 
-    if (!servico) {
-      response.status(404).json({
-        message: "Serviço não encontrado",
-      });
+      const servico =
+        await buscarServicoPorId(
+          id,
+        );
 
-      return;
+      response.json(
+        servico,
+      );
+    } catch (error) {
+      response
+        .status(400)
+        .json({
+          message:
+            error instanceof Error
+              ? error.message
+              : "Erro ao buscar serviço",
+        });
     }
+  },
+);
 
-    response.json(servico);
-  } catch (error) {
-    next(error);
-  }
-});
+/**
+ * A partir daqui:
+ *
+ * somente ADMINISTRADOR
+ * pode alterar serviços.
+ */
+router.use(
+  exigirPerfil(
+    "ADMINISTRADOR",
+  ),
+);
 
-router.post("/", async (request, response, next) => {
-  try {
-    const { nome, descricao, preco, duracao } = request.body;
+/**
+ * Cadastra um novo serviço.
+ */
+router.post(
+  "/",
+  async (request, response) => {
+    try {
+      const servico =
+        await cadastrarServico({
+          nome:
+            request.body.nome,
 
-    const servico = await cadastrarServico({
-      nome,
-      descricao,
-      preco,
-      duracao,
-    });
+          descricao:
+            request.body.descricao,
 
-    response.status(201).json(servico);
-  } catch (error) {
-    next(error);
-  }
-});
+          preco:
+            Number(
+              request.body.preco,
+            ),
 
-router.put("/:id", async (request, response, next) => {
-  try {
-    const id = Number(request.params.id);
+          duracao:
+            Number(
+              request.body.duracao,
+            ),
+        });
 
-    if (!Number.isInteger(id) || id <= 0) {
-      response.status(400).json({
-        message: "Id inválido",
-      });
-
-      return;
+      response
+        .status(201)
+        .json(
+          servico,
+        );
+    } catch (error) {
+      response
+        .status(400)
+        .json({
+          message:
+            error instanceof Error
+              ? error.message
+              : "Erro ao cadastrar serviço",
+        });
     }
+  },
+);
 
-    const { nome, descricao, preco, duracao } = request.body;
+/**
+ * Edita um serviço.
+ */
+router.put(
+  "/:id",
+  async (request, response) => {
+    try {
+      const id =
+        Number(
+          request.params.id,
+        );
 
-    const servico = await editarServico(id, {
-      nome,
-      descricao,
-      preco,
-      duracao,
-    });
+      const servico =
+        await editarServico(
+          id,
+          {
+            nome:
+              request.body.nome,
 
-    if (!servico) {
-      response.status(404).json({
-        message: "Serviço não encontrado",
-      });
+            descricao:
+              request.body.descricao,
 
-      return;
+            preco:
+              Number(
+                request.body.preco,
+              ),
+
+            duracao:
+              Number(
+                request.body.duracao,
+              ),
+          },
+        );
+
+      response.json(
+        servico,
+      );
+    } catch (error) {
+      response
+        .status(400)
+        .json({
+          message:
+            error instanceof Error
+              ? error.message
+              : "Erro ao editar serviço",
+        });
     }
+  },
+);
 
-    response.json(servico);
-  } catch (error) {
-    next(error);
-  }
-});
+/**
+ * Ativa ou inativa um serviço.
+ */
+router.patch(
+  "/:id/ativo",
+  async (request, response) => {
+    try {
+      const id =
+        Number(
+          request.params.id,
+        );
 
-router.patch("/:id/ativo", async (request, response, next) => {
-  try {
-    const id = Number(request.params.id);
+      const servico =
+        await alterarStatusServico(
+          id,
+          request.body.ativo,
+        );
 
-    if (!Number.isInteger(id) || id <= 0) {
-      response.status(400).json({
-        message: "Id inválido",
-      });
-
-      return;
+      response.json(
+        servico,
+      );
+    } catch (error) {
+      response
+        .status(400)
+        .json({
+          message:
+            error instanceof Error
+              ? error.message
+              : "Erro ao alterar status do serviço",
+        });
     }
-
-    const { ativo } = request.body;
-
-    if (typeof ativo !== "boolean") {
-      response.status(400).json({
-        message: "O campo ativo deve ser true ou false",
-      });
-
-      return;
-    }
-
-    const servico = await alterarStatusServico(id, ativo);
-
-    if (!servico) {
-      response.status(404).json({
-        message: "Serviço não encontrado",
-      });
-
-      return;
-    }
-
-    response.json(servico);
-  } catch (error) {
-    next(error);
-  }
-});
+  },
+);
 
 export default router;

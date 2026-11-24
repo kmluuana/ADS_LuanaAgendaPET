@@ -187,6 +187,25 @@ export default function Sidebar() {
 
                 Profissionais
               </NavLink>
+
+              <NavLink
+                to="/admin/servicos"
+                className={({
+                  isActive,
+                }) =>
+                  `sidebar-link ${
+                    isActive
+                      ? "active"
+                      : ""
+                  }`
+                }
+              >
+                <span className="nav-icon">
+                  S
+                </span>
+
+                Serviços
+              </NavLink>
             </>
           )}
         </nav>

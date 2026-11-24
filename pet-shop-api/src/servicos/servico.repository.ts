@@ -1,10 +1,30 @@
 import { db } from "../prisma/db";
 
+type CriarServicoInput = {
+  nome: string;
+  descricao?: string | null;
+  preco: number;
+  duracao: number;
+};
+
+type AtualizarServicoInput = {
+  nome: string;
+  descricao?: string | null;
+  preco: number;
+  duracao: number;
+};
+
 export async function listarServicos() {
-  return db.servico.findMany();
+  return db.servico.findMany({
+    orderBy: {
+      nome: "asc",
+    },
+  });
 }
 
-export async function obterServicoPorId(id: number) {
+export async function obterServicoPorId(
+  id: number,
+) {
   return db.servico.findUnique({
     where: {
       id,
@@ -12,30 +32,24 @@ export async function obterServicoPorId(id: number) {
   });
 }
 
-export async function criarServico(dados: {
-  nome: string;
-  descricao?: string;
-  preco: number;
-  duracao: number;
-}) {
+export async function criarServico(
+  dados: CriarServicoInput,
+) {
   return db.servico.create({
     data: {
       nome: dados.nome,
-      descricao: dados.descricao,
+      descricao:
+        dados.descricao,
       preco: dados.preco,
-      duracao: dados.duracao,
+      duracao:
+        dados.duracao,
     },
   });
 }
 
 export async function atualizarServico(
   id: number,
-  dados: {
-    nome: string;
-    descricao?: string;
-    preco: number;
-    duracao: number;
-  },
+  dados: AtualizarServicoInput,
 ) {
   return db.servico.update({
     where: {
@@ -43,9 +57,11 @@ export async function atualizarServico(
     },
     data: {
       nome: dados.nome,
-      descricao: dados.descricao,
+      descricao:
+        dados.descricao,
       preco: dados.preco,
-      duracao: dados.duracao,
+      duracao:
+        dados.duracao,
     },
   });
 }
